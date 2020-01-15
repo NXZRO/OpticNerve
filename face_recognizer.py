@@ -3,6 +3,7 @@ import cv2
 from skimage.transform import resize
 from scipy.spatial import distance
 from keras.models import load_model
+from mtcnn import MTCNN
 
 
 # OpenCV Cascade classifier detect face
@@ -42,12 +43,12 @@ class FaceRecognizer:
             self.data_base_dict[ID] = face_emb
 
     def recognize(self, inp_frame):
-        face_recognizer.__read_frame(inp_frame)
-        face_recognizer.__face_detect()
-        face_recognizer.__face_extract()
-        face_recognizer.__face_preprocess()
-        face_recognizer.__face_recognize()
-        face_recognizer.__draw_face_box()
+        self.__read_frame(inp_frame)
+        self.__face_detect()
+        self.__face_extract()
+        self.__face_preprocess()
+        self.__face_recognize()
+        self.__draw_face_box()
         return self.inp_frame
 
     def __read_frame(self, inp_frame):
