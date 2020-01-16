@@ -5,10 +5,6 @@ from scipy.spatial import distance
 from keras.models import load_model
 from mtcnn import MTCNN
 
-
-# OpenCV Cascade classifier detect face
-CASCADE_PATH = "./model/haarcascade_frontalface_alt2.xml"
-
 # MS-Celeb-1M dataset pretrained Keras model
 MODEL_PATH = "./model/facenet_keras.h5"
 
@@ -18,6 +14,7 @@ DATA_BASE_PATH = "./data_base/"
 class FaceRecognizer:
     def __init__(self):
         self.model = load_model(MODEL_PATH)
+        self.mtcnn_detector = MTCNN()
         self.inp_frame = None
         self.face_positions = []
         self.raw_faces = []
@@ -33,7 +30,7 @@ class FaceRecognizer:
 
         # compute emb and set emb as dict value
         for (i, ID) in enumerate(self.data_base_dict.keys()):
-            img = cv2.imread(DATA_BASE_PATH + str(i)+'.jpg')
+            img = cv2.imread(DATA_BASE_PATH + str(i) + '.jpg')
             self.__read_frame(img)
             self.__face_detect()
             self.__face_extract()
@@ -43,12 +40,12 @@ class FaceRecognizer:
             self.data_base_dict[ID] = face_emb
 
     def recognize(self, inp_frame):
-        self.__read_frame(inp_frame)
-        self.__face_detect()
-        self.__face_extract()
-        self.__face_preprocess()
-        self.__face_recognize()
-        self.__draw_face_box()
+        face_recognizer.__read_frame(inp_frame)
+        face_recognizer.__face_detect()
+        face_recognizer.__face_extract()
+        face_recognizer.__face_preprocess()
+        face_recognizer.__face_recognize()
+        face_recognizer.__draw_face_box()
         return self.inp_frame
 
     def __read_frame(self, inp_frame):
@@ -60,11 +57,10 @@ class FaceRecognizer:
         self.face_dict = {}
 
     def __face_detect(self):
-        cascade = cv2.CascadeClassifier(CASCADE_PATH)
-        faces = cascade.detectMultiScale(self.inp_frame, scaleFactor=1.1, minNeighbors=3)
+        faces = self.mtcnn_detector.detect_faces(self.inp_frame)
 
         for face in faces:
-            self.face_positions.append(face)
+            self.face_positions.append(face['box'])
 
     def __face_extract(self):
         margin = 6
@@ -72,7 +68,15 @@ class FaceRecognizer:
             (x, y, w, h) = face_pos
             face = self.inp_frame[y:y + h, x:x + w]
             face_margin = np.zeros((h + margin * 2, w + margin * 2, 3), dtype="uint8")
-            face_margin[margin:margin + h, margin:margin + w] = face
+
+            try:
+                face_margin[margin:margin + h, margin:margin + w] = face
+            except ValueError:
+                # Camera shaking cause detect error position, and lead to extract error face shape
+                print('traceback __face_extract func')
+                print('{} : could not broadcast input array from shape {} into shape {}:'.format(ValueError, face.shape,
+                                                                                                 face_margin.shape))
+
             self.raw_faces.append(face_margin)
 
     def __face_preprocess(self):
@@ -86,11 +90,11 @@ class FaceRecognizer:
 
     def __face_recognize(self):
         different_rate = 1
-        
+
         for (i, inp_face) in enumerate(self.inp_faces):
             face_vector = np.concatenate(self.model.predict(inp_face))
             face_emb = self.__l2_normalize(face_vector)
-            
+
             min_dist = 1
             face_ID = 'unknown' + str(i)
 
@@ -131,7 +135,7 @@ class FaceRecognizer:
         for (face_ID, face_pos) in self.face_dict.items():
             (x, y, w, h) = face_pos
             cv2.rectangle(self.inp_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(self.inp_frame, face_ID, (x, y-20), cv2.FONT_HERSHEY_DUPLEX,
+            cv2.putText(self.inp_frame, face_ID, (x, y - 20), cv2.FONT_HERSHEY_DUPLEX,
                         1, (0, 255, 0), 1, cv2.LINE_AA)
 
 
@@ -156,6 +160,3 @@ if __name__ == '__main__':
 
     camera.release()  # camera release
     cv2.destroyAllWindows()  # close windows
-
-
-
