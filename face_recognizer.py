@@ -150,7 +150,7 @@ if __name__ == '__main__':
     while True:
         ret, frame = camera.read()  # get frame
 
-        face_recognizer.recognize(frame)  # recognize frame
+        frame = face_recognizer.recognize(frame)  # recognize frame
 
         cv2.imshow('frame', frame)
 
