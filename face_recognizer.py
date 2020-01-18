@@ -31,17 +31,21 @@ class FaceRecognizer:
         # compute emb and set emb as dict value
         for (i, ID) in enumerate(self.data_base_dict.keys()):
             img = cv2.imread(DATA_BASE_PATH + str(i) + '.jpg')
-            self.__read_frame(img)
-            self.__face_detect()
+            self.detect(img)
             self.__face_extract()
             self.__face_preprocess()
             face_vector = np.concatenate(self.model.predict(self.inp_faces[0]))
             face_emb = self.__l2_normalize(face_vector)
             self.data_base_dict[ID] = face_emb
 
-    def recognize(self, inp_frame):
+    def detect(self, inp_frame):
         face_recognizer.__read_frame(inp_frame)
-        face_recognizer.__face_detect()
+        faces = self.mtcnn_detector.detect_faces(self.inp_frame)
+
+        for face in faces:
+            self.face_locations.append(face['box'])
+
+    def recognize(self):
         face_recognizer.__face_extract()
         face_recognizer.__face_preprocess()
         face_recognizer.__face_recognize()
@@ -55,12 +59,6 @@ class FaceRecognizer:
         self.raw_faces = []
         self.inp_faces = []
         self.face_dict = {}
-
-    def __face_detect(self):
-        faces = self.mtcnn_detector.detect_faces(self.inp_frame)
-
-        for face in faces:
-            self.face_locations.append(face['box'])
 
     def __face_extract(self):
         margin = 6
@@ -141,6 +139,15 @@ class FaceRecognizer:
 
 if __name__ == '__main__':
 
+    prev_face_num = 0
+    curr_face_num = 0
+
+    tracker_flag = 0
+
+    face_trackers = []
+
+    tracker_face_dict = {}
+
     face_recognizer = FaceRecognizer()
 
     face_recognizer.training_data()
@@ -148,9 +155,59 @@ if __name__ == '__main__':
     camera = cv2.VideoCapture(0)  # 0 -> first camera
 
     while True:
-        ret, frame = camera.read()  # get frame
 
-        frame = face_recognizer.recognize(frame)  # recognize frame
+        ret, frame = camera.read()  # get frame
+        face_recognizer.detect(frame)  # face detect
+
+        curr_face_num = len(face_recognizer.face_locations)
+
+        if curr_face_num > 0:
+            print(curr_face_num)
+            print(tracker_flag)
+
+            if tracker_flag == 0 or curr_face_num != prev_face_num:
+                print("recog...")
+
+                frame = face_recognizer.recognize()  # recognize frame
+
+                cv2.putText(frame, "Recognizing...", (0, 30), cv2.FONT_HERSHEY_DUPLEX,
+                            1, (0, 255, 0), 1, cv2.LINE_AA)
+
+                if face_recognizer.face_dict:
+                    tracker_flag = 1
+                    prev_face_num = curr_face_num
+
+                    # initial trackers
+                    face_trackers = []
+                    tracker_face_dict = face_recognizer.face_dict
+
+                    for face_loc in tracker_face_dict.values():
+                        t = cv2.TrackerMedianFlow_create()
+                        t.init(frame, tuple(face_loc))
+                        face_trackers.append(t)
+
+            else:
+                print("trk..")
+
+                for face_tracker, ID in zip(face_trackers, tracker_face_dict.keys()):
+                    ok, face_location = face_tracker.update(frame)
+                    if ok:
+                        tracker_face_dict[ID] = face_location
+                        (x, y, w, h) = (int(face_loc) for face_loc in face_location)
+                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                        cv2.putText(frame, ID, (x, y - 20), cv2.FONT_HERSHEY_DUPLEX,
+                                    1, (0, 0, 255), 1, cv2.LINE_AA)
+                    else:
+                        tracker_flag = 0
+
+                cv2.putText(frame, "Tracking...", (0, 30), cv2.FONT_HERSHEY_DUPLEX,
+                            1, (0, 0, 255), 1, cv2.LINE_AA)
+        else:
+            cv2.putText(frame, "Detecting...", (0, 30), cv2.FONT_HERSHEY_DUPLEX,
+                        1, (255, 0, 0), 1, cv2.LINE_AA)
+
+        cv2.putText(frame, "face_num : " + str(curr_face_num), (0, 60), cv2.FONT_HERSHEY_DUPLEX,
+                    1, (255, 0, 0), 1, cv2.LINE_AA)
 
         cv2.imshow('frame', frame)
 
