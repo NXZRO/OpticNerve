@@ -17,15 +17,15 @@ class FaceTrainer:
 
     def training_data(self):
         # read ID and set ID as dict key
-        file = open(DATA_BASE_PATH + "ID.txt", "r")
-        for ID in file:
-            self.data_base_dict[str(ID).rstrip('\n')] = None
+        with open(DATA_BASE_PATH + "ID.txt", "r") as file:
+            for ID in file:
+                self.data_base_dict[str(ID).rstrip('\n')] = None
 
         # compute emb and set emb as dict value
         for (i, ID) in enumerate(self.data_base_dict.keys()):
             img = cv2.imread(DATA_BASE_PATH + str(i) + ".jpg")              # read img
             face_locations = self.face_detector.detect(img)                 # detect_face
-            face_embs = self.face_recognizer.training(img, face_locations)  # training (get face embeds)
+            face_embs = self.face_recognizer.training(img, face_locations)  # training (get face embeddings)
             self.data_base_dict[ID] = face_embs[0]                          # save into dict
 
         # write data_base_dict back database
