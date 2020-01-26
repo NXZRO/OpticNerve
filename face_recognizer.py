@@ -4,7 +4,6 @@ import json
 from skimage.transform import resize
 from scipy.spatial import distance
 from keras.models import load_model
-import datetime
 
 # MS-Celeb-1M dataset pretrained Keras model
 MODEL_PATH = "./model/facenet_keras.h5"
