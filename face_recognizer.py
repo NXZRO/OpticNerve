@@ -1,6 +1,4 @@
 import numpy as np
-import cv2
-import json
 from skimage.transform import resize
 from scipy.spatial import distance
 from keras.models import load_model
@@ -20,14 +18,8 @@ class FaceRecognizer:
         self.face_dict = {}
         self.data_base_dict = {}
 
-    def load_data_base(self, file_name):
-        self.data_base_dict = {}
-
-        with open(file_name, "r") as fp:
-            load_dict = json.load(fp)
-
-        for (ID, emb) in load_dict.items():
-            self.data_base_dict[ID] = np.array(emb)
+    def load_data(self, data_base_dict):
+        self.data_base_dict = data_base_dict
 
     # provide for face_trainer to face embedding
     def embedding(self, inp_frame, inp_face_locations):
@@ -47,9 +39,8 @@ class FaceRecognizer:
         self.__preprocess_face()
         self.__embedding_face()
         self.__recognize_face()
-        self.__draw_face_box()
 
-        return self.inp_frame
+        return self.face_dict
 
     def __read_frame(self, inp_frame, inp_face_locations):
         # clear params when read new frame
@@ -130,12 +121,3 @@ class FaceRecognizer:
         output = x / np.sqrt(np.maximum(np.sum(np.square(x), axis=axis, keepdims=True), epsilon))
 
         return output
-
-    def __draw_face_box(self):
-        for (face_ID, face_loc) in self.face_dict.items():
-            (x, y, w, h) = face_loc
-            cv2.rectangle(self.inp_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(self.inp_frame, face_ID, (x, y - 20), cv2.FONT_HERSHEY_DUPLEX,
-                        1, (0, 255, 0), 1, cv2.LINE_AA)
-            cv2.putText(self.inp_frame, "Recognizing...", (0, 30), cv2.FONT_HERSHEY_DUPLEX,
-                        1, (0, 255, 0), 1, cv2.LINE_AA)
