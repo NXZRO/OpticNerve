@@ -9,7 +9,7 @@ from mtcnn import MTCNN
 MODEL_PATH = "./model/facenet_keras.h5"
 
 DATA_BASE_PATH = "./data_base/"
-
+IMG_BASE_PATH = DATA_BASE_PATH + "img_base/"
 
 class FaceRecognizer:
     def __init__(self):
@@ -30,7 +30,7 @@ class FaceRecognizer:
 
         # compute emb and set emb as dict value
         for (i, ID) in enumerate(self.data_base_dict.keys()):
-            img = cv2.imread(DATA_BASE_PATH + str(i) + '.jpg')
+            img = cv2.imread(IMG_BASE_PATH + str(i) + '.jpg')
             self.detect(img)
             self.__face_extract()
             self.__face_preprocess()
