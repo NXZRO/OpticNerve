@@ -4,7 +4,7 @@ from face_recognizer import FaceRecognizer
 from face_detector import FaceDetector
 
 DATA_BASE_PATH = "./data_base/"
-
+IMG_BASE_PATH = DATA_BASE_PATH + "img_base/"
 
 class FaceTrainer:
 
@@ -23,10 +23,10 @@ class FaceTrainer:
 
         # compute emb and set emb as dict value
         for (i, ID) in enumerate(self.data_base_dict.keys()):
-            img = cv2.imread(DATA_BASE_PATH + str(i) + ".jpg")              # read img
-            face_locations = self.face_detector.detect(img)                 # detect_face
-            face_embs = self.face_recognizer.training(img, face_locations)  # training (get face embeddings)
-            self.data_base_dict[ID] = face_embs[0]                          # save into dict
+            img = cv2.imread(IMG_BASE_PATH + str(i) + ".jpg")               # read img
+            face_locations = self.face_detector.detect(img)                  # detect_face
+            face_embs = self.face_recognizer.embedding(img, face_locations)  # face embedding
+            self.data_base_dict[ID] = face_embs[0]                           # save into dict
 
         # write data_base_dict back database
         self.__write_data()

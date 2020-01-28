@@ -29,7 +29,8 @@ class FaceRecognizer:
         for (ID, emb) in load_dict.items():
             self.data_base_dict[ID] = np.array(emb)
 
-    def training(self, inp_frame, inp_face_locations):
+    # provide for face_trainer to face embedding
+    def embedding(self, inp_frame, inp_face_locations):
         self.__read_frame(inp_frame, inp_face_locations)
         self.__extract_face()
         self.__preprocess_face()
@@ -44,7 +45,7 @@ class FaceRecognizer:
         self.__read_frame(inp_frame, inp_face_locations)
         self.__extract_face()
         self.__preprocess_face()
-        self.__compute_face_emb()
+        self.__embedding_face()
         self.__recognize_face()
         self.__draw_face_box()
 
@@ -85,7 +86,7 @@ class FaceRecognizer:
             whiten_face = whiten_face[np.newaxis, :]
             self.inp_faces.append(whiten_face)
 
-    def __compute_face_emb(self):
+    def __embedding_face(self):
         for (i, inp_face) in enumerate(self.inp_faces):
             face_vector = np.concatenate(self.model.predict(inp_face))
             self.face_embs.append(self.__l2_normalize(face_vector))
