@@ -2,56 +2,118 @@ from face_recognizer import FaceRecognizer
 from face_detector import FaceDetector
 import cv2
 import pickle
-from os import listdir
-import numpy as np
+import os
+
 
 DATA_BASE_PATH = "./data_base/"
 IMG_BASE_PATH = DATA_BASE_PATH + "img_base/"
-DATA_SET_FILE = DATA_BASE_PATH + "Data.pk"
+CHECK_IMG_BASE_PATH = DATA_BASE_PATH + "check_img_base/"
+
+ID_FILE = DATA_BASE_PATH + "ID.txt"
+USER_TABLE = DATA_BASE_PATH + "user_table.pk"
+USER_NAME_TABLE = DATA_BASE_PATH + "user_name_table.pk"
 
 
 class FaceTrainer:
 
     def __init__(self):
-        self.face_detector = FaceDetector()
-        self.face_recognizer = FaceRecognizer()
-        self.data_base_dict = {}
-        self.face_locations = []
-        self.face_embs = []
+        self.user_name = ""
+        self.user_face_emb = None
 
-    def training_data(self):
-        img_files = listdir(IMG_BASE_PATH)
+        self.user_name_table = {}
+        self.uid = 0
 
-        for ID, img_file in enumerate(img_files):
-            img = cv2.imread(IMG_BASE_PATH + img_file)                       # read img
-            face_locations = self.face_detector.detect(img)                  # detect_face
-            face_embs = self.face_recognizer.embedding(img, face_locations)  # face embedding
-            self.data_base_dict[ID] = face_embs[0]                           # save into dict
+        self.user_table = {}
+        self.user_info = []
 
-        self.__save_data_base()  # write data_base_dict to database
+    def new_user(self, user_name, user_face_embs):
+        self.user_name = user_name
+        self.user_face_emb = user_face_embs[0]
+        self.__save_user()
 
-    def loading_data_base(self):
-        self.__load_data_base()
+    def __save_user(self):
+        # save into user name table
+        self.user_name_table = self.load_table(USER_NAME_TABLE)
+        self.uid = self.user_name_table.setdefault(self.user_name, len(self.user_name_table))
+        self.save_table(USER_NAME_TABLE, self.user_name_table)
 
-    def __save_data_base(self):
-        out_dict = {}
-        for (ID, emb) in self.data_base_dict.items():
-            out_dict[ID] = emb.tolist()
+        # save into user table
+        self.user_table = self.load_table(USER_TABLE)
+        self.user_info = [self.user_name, self.user_face_emb]
+        self.user_table.setdefault(self.uid, self.user_info)
+        self.save_table(USER_TABLE, self.user_table)
 
-        with open(DATA_SET_FILE, "wb") as fp:
-            pickle.dump(out_dict, fp)
+    def load_table(self, table_file):
+        print("loading table ...")
+        if os.path.getsize(table_file) > 0:  # check file is not empty
+            with open(table_file, "rb") as fp:
+                buffer_table = pickle.load(fp)
+        else:
+            buffer_table = {}
 
-    def __load_data_base(self):
-        self.data_base_dict = {}
-        with open(DATA_SET_FILE, 'rb') as fp:
-                load_dict = pickle.load(fp)
+        return buffer_table
 
-        for (ID, emb) in load_dict.items():
-            self.data_base_dict[ID] = np.array(emb)
+    def save_table(self, table_file, buffer_table):
+        print("saving table ...")
+        with open(table_file, "wb") as fp:
+            pickle.dump(buffer_table, fp)
+
+
+def draw_face(frame, face_locations, user_name):
+    color = (255, 0, 0)
+    for face_loc in face_locations:
+        (x, y, w, h) = face_loc
+        # draw face box
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+    cv2.imwrite(CHECK_IMG_BASE_PATH + user_name + ".jpg", frame)
+
+
+def read_ID(user_names):
+    with open(ID_FILE, "r") as fp:
+        for id in fp:
+            user_names.append(str(id).rstrip('\n'))
+    return user_names
 
 
 if __name__ == '__main__':
+    detector = FaceDetector()
+    recognizer = FaceRecognizer()
     trainer = FaceTrainer()
-    trainer.training_data()
-    trainer.loading_data_base()
-    print(trainer.data_base_dict[7])
+
+    # read data and new users
+    # user_names = []
+    # user_names = read_ID(user_names)
+    #
+    # img_files = os.listdir(IMG_BASE_PATH)
+    #
+    # for user_name, img_file in zip(user_names, img_files):
+    #     img = cv2.imread(IMG_BASE_PATH + img_file)  # read img
+    #     face_locs = detector.detect(img)
+    #     user_face_embs = recognizer.recognize(img, face_locs)
+    #     draw_face(img, face_locs, user_name)
+    #     trainer.new_user(user_name, user_face_embs)
+    #
+    # # show table
+    # user_table = trainer.load_table(USER_TABLE)
+    # print(user_table)
+    #
+    # user_name_table = trainer.load_table(USER_NAME_TABLE)
+    # print(user_name_table)
+
+    # ---------------------------------------------------
+    # new one user
+    img = cv2.imread(IMG_BASE_PATH + "0.jpg")  # read img
+    face_locs = detector.detect(img)
+    user_face_embs = recognizer.recognize(img, face_locs)
+    draw_face(img, face_locs, "Obama")
+    trainer.new_user("Obama", user_face_embs)
+
+    # show table
+    user_table = trainer.load_table(USER_TABLE)
+    print(user_table)
+
+    user_name_table = trainer.load_table(USER_NAME_TABLE)
+    print(user_name_table)
+
+
+

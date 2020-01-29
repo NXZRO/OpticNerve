@@ -1,6 +1,5 @@
 import numpy as np
 from skimage.transform import resize
-from scipy.spatial import distance
 from keras.models import load_model
 
 # MS-Celeb-1M dataset pretrained Keras model
@@ -15,32 +14,14 @@ class FaceRecognizer:
         self.raw_faces = []
         self.inp_faces = []
         self.face_embs = []
-        self.face_dict = {}
-        self.data_base_dict = {}
-
-    def load_data(self, data_base_dict):
-        self.data_base_dict = data_base_dict
-
-    # provide for face_trainer to face embedding
-    def embedding(self, inp_frame, inp_face_locations):
-        self.__read_frame(inp_frame, inp_face_locations)
-        self.__extract_face()
-        self.__preprocess_face()
-
-        for (i, inp_face) in enumerate(self.inp_faces):
-            face_vector = np.concatenate(self.model.predict(inp_face))
-            self.face_embs.append(self.__l2_normalize(face_vector))
-
-        return self.face_embs
 
     def recognize(self, inp_frame, inp_face_locations):
         self.__read_frame(inp_frame, inp_face_locations)
         self.__extract_face()
         self.__preprocess_face()
         self.__embedding_face()
-        self.__recognize_face()
 
-        return self.face_dict
+        return self.face_embs
 
     def __read_frame(self, inp_frame, inp_face_locations):
         # clear params when read new frame
@@ -49,7 +30,6 @@ class FaceRecognizer:
         self.raw_faces = []
         self.inp_faces = []
         self.face_embs = []
-        self.face_dict = {}
 
     def __extract_face(self):
         margin = 6
@@ -80,23 +60,8 @@ class FaceRecognizer:
     def __embedding_face(self):
         for (i, inp_face) in enumerate(self.inp_faces):
             face_vector = np.concatenate(self.model.predict(inp_face))
-            self.face_embs.append(self.__l2_normalize(face_vector))
-
-    def __recognize_face(self):
-        different_rate = 1
-
-        for (i, face_emb) in enumerate(self.face_embs):
-            min_dist = 1
-            face_ID = 'unknown' + str(i)
-
-            # search minimum distance face_emb and database emb
-            for (ID, emb) in self.data_base_dict.items():
-                dist = distance.euclidean(face_emb, emb)
-                if dist < min_dist and dist < different_rate:
-                    min_dist = dist
-                    face_ID = ID
-
-            self.face_dict[face_ID] = self.face_locations[i]
+            face_emb = self.__l2_normalize(face_vector)
+            self.face_embs.append(face_emb.astype('float64'))
 
     def __pre_whiten(self, x):
         if x.ndim == 4:

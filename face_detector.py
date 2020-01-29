@@ -13,7 +13,7 @@ class FaceDetector:
         faces = self.mtcnn_detector.detect_faces(self.inp_frame)
 
         for face in faces:
-            self.face_locations.append(face['box'])
+            self.face_locations.append(tuple(face['box']))
 
         return self.face_locations
 
