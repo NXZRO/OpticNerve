@@ -54,11 +54,11 @@ if __name__ == '__main__':
 
         curr_face_num = len(face_locations)
 
-        face_IDs = ["Unknow"+str(i) for i in range(curr_face_num)]
+        face_IDs = ["Detect"+str(i) for i in range(curr_face_num)]
         print(face_IDs)
 
         if curr_face_num:  # there are faces in the frame
-            print("recognizing ...")
+            print("recognizing no search databse...")
             face_embs = face_recognizer.recognize(frame, face_locations)  # face recognize
             draw_face_info(frame, face_IDs, face_locations, RecognizingState, curr_face_num)  # draw frame
 

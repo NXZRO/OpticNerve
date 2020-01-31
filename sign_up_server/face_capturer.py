@@ -12,11 +12,13 @@ class FaceCapturer:
         self.detector = FaceDetector()
         self.recognizer = FaceRecognizer()
         self.frame = None
+        self.face_imgs = []
         self.face_locations = []
         self.face_embs = []
         self.capture_face_num = 0
 
     def capture_face(self):
+        self.face_imgs = []
         self.face_locations = []
         self.face_embs = []
         self.capture_face_num = 0
@@ -32,13 +34,28 @@ class FaceCapturer:
             cv2.imshow('frame', self.frame)  # show frame in window
 
             # press 'q' to stop
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q') and face_emb is not None:
                 self.face_embs.append(face_emb)
+                self.face_imgs.append(self.frame)
                 cv2.imwrite(TMP_PATH + str(self.capture_face_num) + ".jpg", self.frame)
                 self.capture_face_num += 1
 
         camera.release()  # camera release
         cv2.destroyAllWindows()  # close windows
+
+        return self.face_embs
+
+    def capture_test_imgs(self, dir_name):
+        self.face_imgs = []
+        self.face_locations = []
+        self.face_embs = []
+        self.capture_face_num = 0
+        for img_file in os.listdir(dir_name):
+            self.frame = cv2.imread(dir_name + img_file)
+            face_emb = self.__embedding_face()
+            if face_emb is not None:
+                self.face_embs.append(face_emb)
+                self.face_imgs.append(self.frame)
 
         return self.face_embs
 
@@ -50,7 +67,7 @@ class FaceCapturer:
             face_emb = face_embs[0]
             self.__draw_face()
         else:
-            face_emb = []
+            face_emb = None
 
         return face_emb
 

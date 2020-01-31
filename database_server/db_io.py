@@ -6,9 +6,7 @@ PACKAGE_PATH = os.path.dirname(__file__)
 
 DATA_BASE_PATH = PACKAGE_PATH + "/data_base"
 IMG_BASE_PATH = DATA_BASE_PATH + "/img_base/"
-CHECK_IMG_BASE_PATH = DATA_BASE_PATH + "/check_img_base/"
 
-ID_FILE = DATA_BASE_PATH + "/ID.txt"
 USER_TABLE = DATA_BASE_PATH + "/user_table.pk"
 USER_NAME_TABLE = DATA_BASE_PATH + "/user_name_table.pk"
 
@@ -43,23 +41,12 @@ class DataBaseIO:
         return img
 
     def save_img(self, file_name, frame):
+        dir = file_name.rsplit("/", 1)
+
+        if not os.path.isdir(IMG_BASE_PATH + dir[0]):
+            os.mkdir(IMG_BASE_PATH + dir[0])
+
         cv2.imwrite(IMG_BASE_PATH + file_name, frame)
-
-    def load_check_img(self, file_name):
-        img = cv2.imread(CHECK_IMG_BASE_PATH + file_name)
-        return img
-
-    def save_check_img(self, file_name, frame):
-        cv2.imwrite(CHECK_IMG_BASE_PATH + file_name, frame)
-
-    def read_ID(self, user_names):
-        with open(ID_FILE, "r") as fp:
-            for id in fp:
-                user_names.append(str(id).rstrip('\n'))
-        return user_names
-
-    def get_img_base_files_path(self):
-        return os.listdir(IMG_BASE_PATH)
 
     def __load_table(self, table_file):
         print("loading table ...")

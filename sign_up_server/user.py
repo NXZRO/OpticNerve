@@ -3,3 +3,4 @@ class User:
         self.uid = None
         self.name = ""
         self.face_embs = []
+        self.face_imgs = []
