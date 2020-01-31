@@ -2,11 +2,17 @@ import numpy as np
 from skimage.transform import resize
 from keras.models import load_model
 
+import os
+
+
+PACKAGE_PATH = os.path.dirname(__file__)
+
 # MS-Celeb-1M dataset pretrained Keras model
-MODEL_PATH = "./model/facenet_keras.h5"
+MODEL_PATH = PACKAGE_PATH + "/model/facenet_keras.h5"
 
 
 class FaceRecognizer:
+
     def __init__(self):
         self.model = load_model(MODEL_PATH)
         self.inp_frame = None
