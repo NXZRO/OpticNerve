@@ -22,11 +22,13 @@ def test():
 
         user_faces_imgs = face_cap.face_imgs
 
-        user_server.new_user(user_name, user_face_embs, user_faces_imgs)
+        user_server.new_user(user_name, user_face_embs, user_faces_imgs)  # new user
 
     print(user_server.database_io.load_user_table())
 
     print(user_server.database_io.load_user_name_table())
+
+    print(user_server.database_io.load_emb_table())
 
 
 if __name__ == '__main__':
@@ -47,6 +49,7 @@ if __name__ == '__main__':
     # print(user_server.database_io.load_user_table())
     #
     # print(user_server.database_io.load_user_name_table())
-
+    #
+    # print(user_server.database_io.load_emb_table())
 
 

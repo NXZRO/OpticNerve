@@ -79,7 +79,7 @@ class FaceRecognizer:
             size = x.size
 
         else:
-            raise ValueError("Dimension should be 3 or 4")
+            raise ValueError("Dimension should be 3 or 1")
 
         mean = np.mean(x, axis=axis, keepdims=True)
         std = np.std(x, axis=axis, keepdims=True)

@@ -9,6 +9,7 @@ IMG_BASE_PATH = DATA_BASE_PATH + "/img_base/"
 
 USER_TABLE = DATA_BASE_PATH + "/user_table.pk"
 USER_NAME_TABLE = DATA_BASE_PATH + "/user_name_table.pk"
+EMB_TABLE = DATA_BASE_PATH + "/emb_table.pk"
 
 PARAMS_FILE = DATA_BASE_PATH + "/params.pk"
 INDEX_FILE = DATA_BASE_PATH + "/index"
@@ -29,6 +30,12 @@ class DataBaseIO:
 
     def save_user_table(self, buffer_table):
         self.__save_table(USER_TABLE, buffer_table)
+
+    def load_emb_table(self):
+        return self.__load_table(EMB_TABLE)
+
+    def save_emb_table(self, buffer_table):
+        self.__save_table(EMB_TABLE, buffer_table)
 
     def load_params(self):
         return self.__load_table(PARAMS_FILE)

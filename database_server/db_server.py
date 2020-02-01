@@ -9,7 +9,7 @@ INDEX_FILE = DATA_BASE_PATH + "/index"
 TargetPrecision = 0.9
 NumberNeighbors = 1
 
-DistanceRate = 1
+DistanceRate = 0.8
 
 
 class DataBaseServer:
@@ -17,9 +17,10 @@ class DataBaseServer:
         self.io = DataBaseIO()
         self.flann = None
         self.user_table = {}
+        self.emb_table = {}
         self.database_embs = []
         self.target_embs = []
-        self.uids = []
+        self.eids = []
         self.emb_dists = []
         self.user_names = []
 
@@ -37,21 +38,13 @@ class DataBaseServer:
     def search_database(self, target_embs):
         self.target_embs = np.array(target_embs)
         self.__search_idx()
-
-        self.user_names = []
-        i = 0
-        for uid, emb_dist in zip(self.uids, self.emb_dists):
-            if emb_dist < DistanceRate:
-                self.user_names.append(self.user_table[uid]["name"])
-            else:
-                self.user_names.append("Unknow" + str(i))
-                i += 1
+        self.__search_user_name()
 
         return self.user_names
 
     def __load_database_embs(self):
-        self.user_table = self.io.load_user_table()
-        embs = [user_info["face_embs"][0] for user_info in self.user_table.values()]
+        self.emb_table = self.io.load_emb_table()
+        embs = [emb_info["face_embs"] for emb_info in self.emb_table.values()]
         self.database_embs = np.array(embs)
 
     def __build_idx(self):
@@ -64,8 +57,20 @@ class DataBaseServer:
         idxs, dists = self.flann.nn_index(self.target_embs,
                                           num_neighbors=NumberNeighbors,
                                           checks=self.params["checks"])
-        self.uids = idxs
+        self.eids = idxs
         self.emb_dists = dists
+
+    def __search_user_name(self):
+        self.user_table = self.io.load_user_table()
+        self.user_names = []
+        i = 0
+        for eid, emb_dist in zip(self.eids, self.emb_dists):
+            if emb_dist < DistanceRate:
+                uid = self.emb_table[eid]["uid"]
+                self.user_names.append(self.user_table[uid]["name"])
+            else:
+                self.user_names.append("Unknow" + str(i))
+                i += 1
 
     def __load_idx(self):
         self.params = self.io.load_params()
@@ -81,7 +86,7 @@ if __name__ == '__main__':
     server = DataBaseServer()
     user_name_table = server.io.load_user_name_table()
     print(user_name_table)
-    uid = user_name_table["Trump"]
+    uid = user_name_table["Kp"]
     user_table = server.io.load_user_table()
     user_info = user_table[uid]
     target_embs = user_info["face_embs"]
