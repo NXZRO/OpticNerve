@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.transform import resize
-from keras.models import load_model
+import tensorflow as tf
+
 
 import os
 
@@ -14,7 +15,7 @@ MODEL_PATH = PACKAGE_PATH + "/model/facenet_keras.h5"
 class FaceRecognizer:
 
     def __init__(self):
-        self.model = load_model(MODEL_PATH)
+        self.model = tf.keras.models.load_model(MODEL_PATH)
         self.inp_frame = None
         self.face_locations = []
         self.raw_faces = []
@@ -58,7 +59,6 @@ class FaceRecognizer:
                 break
             else:
                 self.raw_faces.append(face_margin)
-
 
     def __preprocess_face(self):
         image_size = 160  # facenet model need 160×160 image size

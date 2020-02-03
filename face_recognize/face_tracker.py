@@ -17,7 +17,7 @@ class FaceTracker:
         for face_tracker, ID in zip(self.face_trackers, self.face_dict.keys()):
             ok, face_location = face_tracker.update(self.inp_frame)
             if ok:
-                face_location = [int(face_loc) for face_loc in face_location]  # transform type like [x, y, w, h]
+                face_location = tuple(int(face_loc) for face_loc in face_location)  # transform type like (x, y, w, h)
                 self.face_tracker_dict[ID] = face_location
             else:
                 tracker_ok = 0
@@ -27,6 +27,6 @@ class FaceTracker:
     def __initial_trackers(self):
         for face_loc in self.face_dict.values():
             t = cv2.TrackerMedianFlow_create()
-            t.init(self.inp_frame, tuple(face_loc))
+            t.init(self.inp_frame, face_loc)
             self.face_trackers.append(t)
 
