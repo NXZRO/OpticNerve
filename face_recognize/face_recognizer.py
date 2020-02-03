@@ -24,10 +24,13 @@ class FaceRecognizer:
     def recognize(self, inp_frame, inp_face_locations):
         self.__read_frame(inp_frame, inp_face_locations)
         self.__extract_face()
-        self.__preprocess_face()
-        self.__embedding_face()
+        if self.raw_faces is None:
+            return None
+        else:
+            self.__preprocess_face()
+            self.__embedding_face()
 
-        return self.face_embs
+            return self.face_embs
 
     def __read_frame(self, inp_frame, inp_face_locations):
         # clear params when read new frame
@@ -51,8 +54,11 @@ class FaceRecognizer:
                 print('traceback __face_extract func')
                 print('{} : could not broadcast input array from shape {} into shape {}:'.format(ValueError, face.shape,
                                                                                                  face_margin.shape))
+                self.raw_faces = None
+                break
+            else:
+                self.raw_faces.append(face_margin)
 
-            self.raw_faces.append(face_margin)
 
     def __preprocess_face(self):
         image_size = 160  # facenet model need 160×160 image size
