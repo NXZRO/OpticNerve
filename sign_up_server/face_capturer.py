@@ -64,8 +64,11 @@ class FaceCapturer:
 
         if self.face_locations:
             face_embs = self.recognizer.recognize(self.frame, self.face_locations)
-            face_emb = face_embs[0]
-            self.__draw_face()
+            if face_embs is None:
+                face_emb = None
+            else:
+                face_emb = face_embs[0]
+                self.__draw_face()
         else:
             face_emb = None
 

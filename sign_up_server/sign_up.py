@@ -33,23 +33,23 @@ def test():
 
 if __name__ == '__main__':
 
-    test()
+    # test()
 
-    # user_server = UserServer()
-    #
-    # user_name = "owo"
-    #
-    # face_cap = FaceCapturer()
-    # user_face_embs = face_cap.capture_face()
-    #
-    # user_faces_imgs = face_cap.face_imgs
-    #
-    # user_server.new_user(user_name, user_face_embs, user_faces_imgs)
-    #
-    # print(user_server.database_io.load_user_table())
-    #
-    # print(user_server.database_io.load_user_name_table())
-    #
-    # print(user_server.database_io.load_emb_table())
+    user_server = UserServer()
+
+    user_name = "OwO"
+
+    face_cap = FaceCapturer()
+    user_face_embs = face_cap.capture_face()
+
+    user_faces_imgs = face_cap.face_imgs
+
+    user_server.new_user(user_name, user_face_embs, user_faces_imgs)
+
+    print(user_server.database_io.load_user_table())
+
+    print(user_server.database_io.load_user_name_table())
+
+    print(user_server.database_io.load_emb_table())
 
 
