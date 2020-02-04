@@ -1,5 +1,12 @@
 from database_server.db_io import DataBaseIO
-from sign_up_server.user import User
+
+
+class User:
+    def __init__(self):
+        self.uid = None
+        self.name = ""
+        self.face_embs = []
+        self.face_imgs = []
 
 
 class UserServer:

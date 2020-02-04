@@ -4,7 +4,7 @@ from sign_up_server.user_server import UserServer
 import os
 
 
-def test():
+def test_sign_up_dataset():
 
     user_server = UserServer()
     face_cap = FaceCapturer()
@@ -12,7 +12,7 @@ def test():
     dirs = os.listdir("./test_img_base")
     user_names = []
 
-    with open("./ID.txt", "r") as fp:
+    with open("./test_img_base/ID.txt", "r") as fp:
         for id in fp:
             user_names.append(str(id).rstrip('\n'))
 
@@ -31,13 +31,10 @@ def test():
     print(user_server.database_io.load_emb_table())
 
 
-if __name__ == '__main__':
-
-    # test()
-
+def test_sign_up_user(inp_user_name):
     user_server = UserServer()
 
-    user_name = "OwO"
+    user_name = inp_user_name
 
     face_cap = FaceCapturer()
     user_face_embs = face_cap.capture_face()
@@ -51,5 +48,17 @@ if __name__ == '__main__':
     print(user_server.database_io.load_user_name_table())
 
     print(user_server.database_io.load_emb_table())
+
+
+if __name__ == '__main__':
+
+    # sign up from test img base people
+    # test_sign_up_dataset()
+
+    # sign up yourself
+    user_name = "OWO"
+    test_sign_up_user(user_name)
+
+
 
 

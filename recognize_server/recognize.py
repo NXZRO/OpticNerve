@@ -73,21 +73,24 @@ class RecognizeServer:
             self.tracker_flag = 1                                                    # set next frame use tracking
             self.prev_face_num = self.curr_face_num                                  # record face num
 
-            self.face_dict = {id: loc for id, loc in zip(self.face_IDs, self.face_locations)}
+            self.face_dict = self.__build_face_dict()
             self.face_tracker = FaceTracker(self.frame, self.face_dict)              # initial trackers
 
     def __track(self):
         ok, self.face_dict = self.face_tracker.track(self.frame)  # face track
 
-        self.face_IDs, self.face_locations = self.__unzip_dict(self.face_dict)
+        self.face_IDs, self.face_locations = self.__unzip_face_dict()
 
         if not ok:
             self.tracker_flag = 0  # set next frame use recognizing
 
-    def __unzip_dict(self,dict):
+    def __build_face_dict(self):
+        return {id: loc for id, loc in zip(self.face_IDs, self.face_locations)}
+
+    def __unzip_face_dict(self):
         ks = []
         vs = []
-        for k, v in dict.items():
+        for k, v in self.face_dict.items():
             ks.append(k)
             vs.append(v)
         return ks, vs
