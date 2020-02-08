@@ -1,105 +1,104 @@
-from pyflann import *
-import numpy as np
-from database_server.db_io import DataBaseIO
+import pickle
+import os
+import cv2
+import shutil
 
 PACKAGE_PATH = os.path.dirname(__file__)
+
 DATA_BASE_PATH = PACKAGE_PATH + "/data_base"
+IMG_BASE_PATH = DATA_BASE_PATH + "/img_base/"
+
+USER_TABLE = DATA_BASE_PATH + "/user_table.pk"
+USER_NAME_TABLE = DATA_BASE_PATH + "/user_name_table.pk"
+EMB_TABLE = DATA_BASE_PATH + "/emb_table.pk"
+
+PARAMS_FILE = DATA_BASE_PATH + "/params.pk"
 INDEX_FILE = DATA_BASE_PATH + "/index"
 
-TargetPrecision = 0.9
-NumberNeighbors = 1
 
-DistanceRate = 0.8
+class Table:
+    def __init__(self, table_name):
+        self.table_name = table_name
+        self.__table = None
 
+    def new(self, key, value):
+        self.__table = self.__load()
+        self.__table[key] = value
+        self.__save(self.__table)
 
-class DataBaseServer:
+    def delete(self, key):
+        self.__table = self.__load()
+        self.__table.pop(key)
+        self.__save(self.__table)
+
+    def get(self, key):
+        self.__table = self.__load()
+        return self.__table.setdefault(key, None)
+
+    def get_keys(self):
+        self.__table = self.__load()
+        return self.__table.keys()
+
+    def get_values(self):
+        self.__table = self.__load()
+        return self.__table.values()
+
+    def show(self):
+        table = self.__load()
+        print(table)
+
+    def __load(self):
+        if os.path.getsize(self.table_name) > 0:  # check file is not empty
+            with open(self.table_name, "rb") as fp:
+                buffer_table = pickle.load(fp)
+        else:
+            buffer_table = {}
+
+        return buffer_table
+
+    def __save(self, buffer_table):
+        with open(self.table_name, "wb") as fp:
+            pickle.dump(buffer_table, fp)
+
+class DataBase:
     def __init__(self):
-        self.io = DataBaseIO()
-        self.flann = None
-        self.user_table = {}
-        self.emb_table = {}
-        self.database_embs = []
-        self.target_embs = []
-        self.eids = []
-        self.emb_dists = []
-        self.user_names = []
+        self.__TableName = {"USER_TABLE": USER_TABLE, "USER_NAME_TABLE": USER_NAME_TABLE, "EMB_TABLE": EMB_TABLE}
+        self.table = None
 
-    def build_database(self):
-        self.flann = FLANN()
-        self.__load_database_embs()
-        self.__build_idx()
-        self.__save_idx()
+    def load_table(self, table_name):
+        return Table(self.__TableName[table_name])
 
-    def load_database(self):
-        self.flann = FLANN()
-        self.__load_database_embs()
-        self.__load_idx()
+    def load_img(self, file_name):
+        img = cv2.imread(IMG_BASE_PATH + file_name)
+        return img
 
-    def search_database(self, target_embs):
-        self.target_embs = np.array(target_embs)
-        self.__search_idx()
-        self.__search_user_name()
+    def save_img(self, file_name, frame):
+        dir = file_name.rsplit("/", 1)
 
-        return self.user_names
+        if not os.path.isdir(IMG_BASE_PATH + dir[0]):
+            os.mkdir(IMG_BASE_PATH + dir[0])
 
-    def delete_database(self):
-        self.io.delete_database()
+        cv2.imwrite(IMG_BASE_PATH + file_name, frame)
 
-    def __load_database_embs(self):
-        self.emb_table = self.io.load_emb_table()
-        embs = [emb_info["face_embs"] for emb_info in self.emb_table.values()]
-        self.database_embs = np.array(embs)
+    def remove_img(self, file_name):
+        shutil.rmtree(IMG_BASE_PATH + file_name)  # delete user img dir
 
-    def __build_idx(self):
-        print("start building ...")
-        self.params = self.flann.build_index(self.database_embs, algorithm="autotuned",
-                                             target_precision=TargetPrecision)
+    def clear(self):
+        tables = [USER_TABLE,USER_NAME_TABLE,EMB_TABLE,PARAMS_FILE,INDEX_FILE]
+        # delete table
+        for table_file in tables:
+            with open(table_file, "wb") as fp:
+                fp.truncate()
 
-    def __search_idx(self):
-        print("searching target ...")
-        idxs, dists = self.flann.nn_index(self.target_embs,
-                                          num_neighbors=NumberNeighbors,
-                                          checks=self.params["checks"])
-        self.eids = idxs
-        self.emb_dists = dists
+        # delete img base dir
+        shutil.rmtree(IMG_BASE_PATH)
 
-    def __search_user_name(self):
-        self.user_table = self.io.load_user_table()
-        self.user_names = []
-
-        for eid, emb_dist in zip(self.eids, self.emb_dists):
-            if emb_dist < DistanceRate:
-                uid = self.emb_table[eid]["uid"]
-                self.user_names.append(self.user_table[uid]["name"])
-            else:
-                self.user_names.append("")
-
-    def __load_idx(self):
-        self.params = self.io.load_params()
-        self.flann.load_index(INDEX_FILE.encode('utf-8'), self.database_embs)
-
-    def __save_idx(self):
-        self.io.save_params(self.params)
-        self.flann.save_index(INDEX_FILE.encode('utf-8'))
+        # create new img dir
+        os.mkdir(IMG_BASE_PATH)
 
 
 if __name__ == '__main__':
-
-    server = DataBaseServer()
-    server.delete_database()
-    user_name_table = server.io.load_user_name_table()
-    print(user_name_table)
-    # uid = user_name_table["Kp"]
-    # user_table = server.io.load_user_table()
-    # user_info = user_table[uid]
-    # target_embs = user_info["face_embs"]
-    # print(target_embs)
-    # op = 0
-    # if op == 0:
-    #     server.build_database()
-    # else:
-    #     server.load_database()
-    #
-    # user_names = server.search_database(target_embs[0])
-    # print(user_names)
-
+    db = DataBase()
+    db.clear()
+    user_table = db.load_table("USER_NAME_TABLE")
+    user_table.show()

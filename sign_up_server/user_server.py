@@ -1,4 +1,4 @@
-from database_server.test_databse_server import DataBase
+from database_server.db_server import DataBase
 
 
 class User:

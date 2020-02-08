@@ -1,7 +1,7 @@
 from pyflann import *
 import numpy as np
 import pickle
-from database_server.test_databse_server import DataBase
+from database_server.db_server import DataBase
 
 PACKAGE_PATH = os.path.dirname(__file__)
 DATA_BASE_PATH = PACKAGE_PATH + "/data_base"
