@@ -16,19 +16,14 @@ def test_sign_up_dataset():
         for id in fp:
             user_names.append(str(id).rstrip('\n'))
 
-    for user_name, dir in zip(user_names, dirs):
+    for i, (user_name, dir) in enumerate(zip(user_names, dirs)):
         print(dir)
+
         user_face_embs = face_cap.capture_test_imgs("./test_img_base/" + dir + "/")
 
         user_faces_imgs = face_cap.face_imgs
 
         user_server.new_user(user_name, user_face_embs, user_faces_imgs)  # new user
-
-    print(user_server.database_io.load_user_table())
-
-    print(user_server.database_io.load_user_name_table())
-
-    print(user_server.database_io.load_emb_table())
 
 
 def test_sign_up_user(inp_user_name):
@@ -43,21 +38,38 @@ def test_sign_up_user(inp_user_name):
 
     user_server.new_user(user_name, user_face_embs, user_faces_imgs)
 
-    print(user_server.database_io.load_user_table())
 
-    print(user_server.database_io.load_user_name_table())
+def test_delete_user(inp_user_name):
+    user_server = UserServer()
 
-    print(user_server.database_io.load_emb_table())
+    user_server.delete_user(inp_user_name)
 
 
 if __name__ == '__main__':
 
     # sign up from test img base people
-    # test_sign_up_dataset()
+    test_sign_up_dataset()
 
     # sign up yourself
-    user_name = "OWO"
-    test_sign_up_user(user_name)
+    # user_name = "OwO"
+    # test_sign_up_user(user_name)
+
+    # delete user
+    # user_name = "4Gen"
+    # test_delete_user(user_name)
+
+    # delete database
+    # user_server = UserServer()
+    # user_server.database.clear()
+
+    # show table
+    # user_server = UserServer()
+    # user_table = user_server.database.load_table("USER_TABLE")
+    # user_name_table = user_server.database.load_table("USER_NAME_TABLE")
+    # emb_table = user_server.database.load_table("EMB_TABLE")
+    # user_table.show()
+    # emb_table.show()
+    # user_name_table.show()
 
 
 

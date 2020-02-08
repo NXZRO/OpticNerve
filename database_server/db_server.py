@@ -42,6 +42,9 @@ class DataBaseServer:
 
         return self.user_names
 
+    def delete_database(self):
+        self.io.delete_database()
+
     def __load_database_embs(self):
         self.emb_table = self.io.load_emb_table()
         embs = [emb_info["face_embs"] for emb_info in self.emb_table.values()]
@@ -63,14 +66,13 @@ class DataBaseServer:
     def __search_user_name(self):
         self.user_table = self.io.load_user_table()
         self.user_names = []
-        i = 0
+
         for eid, emb_dist in zip(self.eids, self.emb_dists):
             if emb_dist < DistanceRate:
                 uid = self.emb_table[eid]["uid"]
                 self.user_names.append(self.user_table[uid]["name"])
             else:
-                self.user_names.append("Unknow" + str(i))
-                i += 1
+                self.user_names.append("")
 
     def __load_idx(self):
         self.params = self.io.load_params()
@@ -84,19 +86,20 @@ class DataBaseServer:
 if __name__ == '__main__':
 
     server = DataBaseServer()
+    server.delete_database()
     user_name_table = server.io.load_user_name_table()
     print(user_name_table)
-    uid = user_name_table["Kp"]
-    user_table = server.io.load_user_table()
-    user_info = user_table[uid]
-    target_embs = user_info["face_embs"]
-    print(target_embs)
-    op = 0
-    if op == 0:
-        server.build_database()
-    else:
-        server.load_database()
-
-    user_names = server.search_database(target_embs[0])
-    print(user_names)
+    # uid = user_name_table["Kp"]
+    # user_table = server.io.load_user_table()
+    # user_info = user_table[uid]
+    # target_embs = user_info["face_embs"]
+    # print(target_embs)
+    # op = 0
+    # if op == 0:
+    #     server.build_database()
+    # else:
+    #     server.load_database()
+    #
+    # user_names = server.search_database(target_embs[0])
+    # print(user_names)
 

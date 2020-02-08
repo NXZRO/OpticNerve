@@ -1,6 +1,8 @@
 import pickle
 import os
 import cv2
+import shutil
+
 
 PACKAGE_PATH = os.path.dirname(__file__)
 
@@ -18,6 +20,19 @@ INDEX_FILE = DATA_BASE_PATH + "/index"
 class DataBaseIO:
     def __init__(self):
         self.buffer = {}
+
+    def delete_database(self):
+        # delete table
+        table_files = [USER_NAME_TABLE, USER_TABLE, EMB_TABLE, INDEX_FILE, PARAMS_FILE]
+        for table_file in table_files:
+            with open(table_file, "wb") as fp:
+                fp.truncate()
+
+        # delete img base dir
+        shutil.rmtree(IMG_BASE_PATH)
+
+        # create new img dir
+        os.mkdir(IMG_BASE_PATH)
 
     def load_user_name_table(self):
         return self.__load_table(USER_NAME_TABLE)
@@ -55,6 +70,9 @@ class DataBaseIO:
 
         cv2.imwrite(IMG_BASE_PATH + file_name, frame)
 
+    def remove_img(self, file_name):
+        shutil.rmtree(IMG_BASE_PATH + file_name)  # delete user img dir
+
     def __load_table(self, table_file):
         print("loading table ...")
         if os.path.getsize(table_file) > 0:  # check file is not empty
@@ -69,3 +87,5 @@ class DataBaseIO:
         print("saving table ...")
         with open(table_file, "wb") as fp:
             pickle.dump(buffer_table, fp)
+
+

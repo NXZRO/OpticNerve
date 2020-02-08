@@ -25,20 +25,41 @@ class FaceCapturer:
 
         camera = cv2.VideoCapture(0)  # 0 -> first camera
 
-        while self.capture_face_num < 3:
+        camera_flag = 1
+        msg_flag = 0
+
+        while camera_flag:
 
             ret, self.frame = camera.read()  # get frame
 
             face_emb = self.__embedding_face()
 
+            if msg_flag == 1:
+                cv2.putText(self.frame, "You must take one picture", (0, 120),
+                            cv2.FONT_HERSHEY_DUPLEX,
+                            1, (0, 0, 255), 1, cv2.LINE_AA)
+
+            self.__draw_info()
+
             cv2.imshow('frame', self.frame)  # show frame in window
 
-            # press 'q' to stop
-            if cv2.waitKey(1) & 0xFF == ord('q') and face_emb is not None:
+            press_key = cv2.waitKey(1)
+
+            # press 'SP' to capture
+            if press_key & 0xFF == ord(' ') and face_emb is not None:
                 self.face_embs.append(face_emb)
                 self.face_imgs.append(self.frame)
                 cv2.imwrite(TMP_PATH + str(self.capture_face_num) + ".jpg", self.frame)
                 self.capture_face_num += 1
+                msg_flag = 0
+
+            # press 'q' to exit
+            elif press_key & 0xFF == ord('q'):
+                if self.capture_face_num < 1:
+                    print("ww")
+                    msg_flag = 1
+                else:
+                    camera_flag = 0
 
         camera.release()  # camera release
         cv2.destroyAllWindows()  # close windows
@@ -78,11 +99,17 @@ class FaceCapturer:
         color = (255, 0, 0)
         for face_loc in self.face_locations:
             (x, y, w, h) = face_loc
-            # draw face box
-            cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)
+            cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)  # draw face box
 
-        # draw current face num
-        cv2.putText(self.frame, "cap_face_num : " + str(self.capture_face_num), (0, 60), cv2.FONT_HERSHEY_DUPLEX,
+    def __draw_info(self):
+        color = (255, 0, 0)
+        cv2.putText(self.frame, "cap_face_num : " + str(self.capture_face_num), (0, 30), cv2.FONT_HERSHEY_DUPLEX,
+                    1, color, 1, cv2.LINE_AA)
+
+        cv2.putText(self.frame, "press 'space' to capture face", (0, 60), cv2.FONT_HERSHEY_DUPLEX,
+                    1, color, 1, cv2.LINE_AA)
+
+        cv2.putText(self.frame, "press 'q' to exit", (0, 90), cv2.FONT_HERSHEY_DUPLEX,
                     1, color, 1, cv2.LINE_AA)
 
 
