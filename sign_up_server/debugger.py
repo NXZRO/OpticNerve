@@ -42,7 +42,7 @@ def test_sign_up_user(inp_user_name):
 def test_delete_user(inp_user_name):
     user_server = UserServer()
 
-    user_server.delete_user(inp_user_name)
+    user_server.remove_user(inp_user_name)
 
 
 if __name__ == '__main__':
@@ -55,21 +55,12 @@ if __name__ == '__main__':
     # test_sign_up_user(user_name)
 
     # delete user
-    # user_name = "4Gen"
+    # user_name = "OwO"
     # test_delete_user(user_name)
 
-    # delete database
+    # delete database_server
     # user_server = UserServer()
-    # user_server.database.clear()
-
-    # show table
-    # user_server = UserServer()
-    # user_table = user_server.database.load_table("USER_TABLE")
-    # user_name_table = user_server.database.load_table("USER_NAME_TABLE")
-    # emb_table = user_server.database.load_table("EMB_TABLE")
-    # user_table.show()
-    # emb_table.show()
-    # user_name_table.show()
+    # user_server.database_server.clear()
 
 
 

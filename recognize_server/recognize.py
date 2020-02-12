@@ -56,7 +56,7 @@ class RecognizeServer:
         face_embs = self.face_recognizer.recognize(self.frame, self.face_locations)  # face recognize
 
         if face_embs is not None:
-            print("searching database...")
+            print("searching database_server...")
             self.face_IDs = self.flann_server.search(face_embs)                # search data base
 
     def __draw_face_info(self):

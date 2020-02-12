@@ -1,99 +1,67 @@
-from database_server.db_server import DataBase
-
-
-class User:
-    def __init__(self):
-        self.uid = None
-        self.name = ""
-        self.face_embs = []
-        self.face_imgs = []
-        self.eids = []
+from database_server.mongo_server import UserTable, EmbTable, IdTable
+from database_server.img_server import ImgServer
 
 
 class UserServer:
 
     def __init__(self):
-        self.database = DataBase()
-        self.user = None
+        self.id_tb = IdTable()
+        self.user_tb = UserTable()
+        self.emb_tb = EmbTable()
+        self.img_server = ImgServer()
 
     def new_user(self, user_name, user_face_embs, user_face_imgs):
+        user_data = self.user_tb.get_user_data_by_name(user_name)
 
-        user_name_table = self.database.load_table("USER_NAME_TABLE")
-
-        # check user exist
-        if user_name_table.get(user_name) is not None:
-
+        if user_data is not None:
             print("user '{}' is exist ...".format(user_name))
 
         else:
-            self.user = User()
-            self.user.name = user_name
+            print("new user '{}' ...".format(user_name))
 
-            self.user.face_embs = user_face_embs
-            self.user.face_imgs = user_face_imgs
+            # new uid and eid, then update uid and eid to user table
+            curr_uid = self.id_tb.get_uid()
+            curr_eid = self.id_tb.get_eid()
 
-            # search user name table by user name, and new uid
-            uids = list(user_name_table.get_values())
+            uid = curr_uid + 1
+            eids = [curr_eid + i + 1 for i, _ in enumerate(user_face_embs)]
 
-            if uids == []:
-                self.user.uid = 0
-            else:
-                self.user.uid = uids[-1] + 1
+            self.id_tb.update_uid(uid)
+            self.id_tb.update_eid(eids[-1])
 
-            user_name_table.new(self.user.name, self.user.uid)
+            # insert user to user table
+            user_data = {"uid": uid, "name": user_name, "eids": eids}
+            self.user_tb.insert_user(user_data)
 
-            # add into emb table
-            emb_table = self.database.load_table("EMB_TABLE")
-            eids = list(emb_table.get_keys())
-
-            if eids == []:
-                eid = 0
-            else:
-                eid = eids[-1] + 1
-
-            for emb in self.user.face_embs:
-                self.user.eids.append(eid)
-                emb_info = {"face_embs": emb, "uid": self.user.uid}
-                emb_table.new(eid, emb_info)
-                eid += 1
-
-            # search user table by uid, and new user info
-            self.user.info = {"name": self.user.name, "eids": self.user.eids, "face_embs": self.user.face_embs}
-            user_table = self.database.load_table("USER_TABLE")
-            user_table.new(self.user.uid, self.user.info)
+            # insert face embs to emb table
+            for eid, emb in zip(eids, user_face_embs):
+                emb_data = {"eid": eid, "face_emb": emb.tolist(), "uid": uid}
+                self.emb_tb.insert_emb(emb_data)
 
             # save face img to img base
-            for i, img in enumerate(self.user.face_imgs):
-                self.database.save_img(self.user.name + "/" + str(i) + ".jpg", img)
+            for i, img in enumerate(user_face_imgs):
+                self.img_server.save_img(user_name + "/" + str(i) + ".jpg", img)
 
-            print("new user success...")
+            print("new user success ...")
 
-    def delete_user(self, user_name):
-        user_name_table = self.database.load_table("USER_NAME_TABLE")
+    def remove_user(self, user_name):
 
-        uid = user_name_table.get(user_name)
+        user_data = self.user_tb.get_user_data_by_name(user_name)
 
-        # check user exist
-        if uid is None:
-
+        if user_data is None:
             print("user '{}' isn't exist ...".format(user_name))
 
         else:
-            # remove from user name table
-            user_name_table.delete(user_name)
+            print("remove user '{}' ...".format(user_name))
 
-            # remove form user table
-            user_table = self.database.load_table("USER_TABLE")
-            user_info = user_table.get(uid)
-            eids = user_info["eids"]
-            user_table.delete(uid)
+            # remove user from user table
+            self.user_tb.remove_user(user_data["uid"])
 
-            # remove from emb table
-            emb_table = self.database.load_table("EMB_TABLE")
-            for eid in eids:
-                emb_table.delete(eid)
+            # remove face embs from emb table
+            for eid in user_data["eids"]:
+                self.emb_tb.remove_emb(eid)
 
-            # remove user img dir
-            self.database.remove_img(user_name)
+            # remove face img from img base
+            self.img_server.remove_img(user_name)
 
-            print("delete user success...")
+            print("remove user success ...")

@@ -1,7 +1,7 @@
+from database_server.mongo_server import *
 from pyflann import *
 import numpy as np
 import pickle
-from database_server.db_server import DataBase
 
 PACKAGE_PATH = os.path.dirname(__file__)
 DATA_BASE_PATH = PACKAGE_PATH + "/data_base"
@@ -16,32 +16,27 @@ DistanceRate = 0.8
 
 class FlannServer:
     def __init__(self):
-        self.database = DataBase()
         self.flann = None
 
-        self.database_embs = None
-        self.params = None
+        self.user_tb = UserTable()
+        self.emb_tb = EmbTable()
 
-        self.user_table = {}
-        self.emb_table = {}
-        self.emb_table_eids = []
+        self.emb_tb_eids = None
+        self.emb_tb_embs = None
+        self.params = None
 
     def build(self):
         print("building flann...")
-        # load user table
-        self.user_table = self.database.load_table("USER_TABLE")
 
         # initial flann
         self.flann = FLANN()
 
-        # load embs
-        self.emb_table = self.database.load_table("EMB_TABLE")
-        self.emb_table_eids = list(self.emb_table.get_keys())
-        embs = [emb_info["face_embs"] for emb_info in self.emb_table.get_values()]
-        self.database_embs = np.array(embs)
+        # load eids and embs
+        self.emb_tb_eids, self.emb_tb_embs = self.emb_tb.get_eids_embs()
+        self.emb_tb_embs = np.array(self.emb_tb_embs)
 
         # building flann index
-        self.params = self.flann.build_index(self.database_embs, algorithm="autotuned",
+        self.params = self.flann.build_index(self.emb_tb_embs, algorithm="autotuned",
                                              target_precision=TargetPrecision)
         # save params and index
         self.__save_params(self.params)
@@ -49,21 +44,17 @@ class FlannServer:
 
     def load(self):
         print("loading flann...")
-        # load user table
-        self.user_table = self.database.load_table("USER_TABLE")
 
         # initial flann
         self.flann = FLANN()
 
-        # load embs
-        self.emb_table = self.database.load_table("EMB_TABLE")
-        self.emb_table_eids = list(self.emb_table.get_keys())
-        embs = [emb_info["face_embs"] for emb_info in self.emb_table.get_values()]
-        self.database_embs = np.array(embs)
+        # load eids and embs
+        self.emb_tb_eids, self.emb_tb_embs = self.emb_tb.get_eids_embs()
+        self.emb_tb_embs = np.array(self.emb_tb_embs)
 
         # load params and index
         self.params = self.__load_params()
-        self.flann.load_index(INDEX_FILE.encode('utf-8'), self.database_embs)
+        self.flann.load_index(INDEX_FILE.encode('utf-8'), self.emb_tb_embs)
 
     def search(self, inp_target_embs):
         print("searching target ...")
@@ -74,17 +65,25 @@ class FlannServer:
         idxs, dists = self.flann.nn_index(target_embs,
                                           num_neighbors=NumberNeighbors,
                                           checks=self.params["checks"])
-        # map user name from user table
+        # search user name
         user_names = []
         for idx, dist in zip(idxs, dists):
             if dist < DistanceRate:
-                eid = self.emb_table_eids[idx]
-                uid = self.emb_table.get(eid)["uid"]
-                user_names.append(self.user_table.get(uid)["name"])
+                eid = self.emb_tb_eids[idx]
+                uid = self.emb_tb.get_uid(eid)
+                user_data = self.user_tb.get_user_data_by_uid(uid)
+                user_names.append(user_data["name"])
             else:
                 user_names.append("")
 
         return user_names
+
+    def reset(self):
+        # remove content from file
+        files = [PARAMS_FILE, INDEX_FILE]
+        for file in files:
+            with open(file, "wb") as fp:
+                fp.truncate()
 
     def __load_params(self):
         if os.path.getsize(PARAMS_FILE) > 0:  # check file is not empty
@@ -101,17 +100,21 @@ class FlannServer:
 
 
 if __name__ == '__main__':
-    db = DataBase()
-
-    user_name_table = db.load_table("USER_NAME_TABLE")
-    uid = user_name_table.get("Kp")
-
-    user_table = db.load_table("USER_TABLE")
-    user_info = user_table.get(uid)
-    embs = user_info["face_embs"]
+    # user_tb = UserTable()
+    # emb_tb = EmbTable()
+    #
+    # user_data = user_tb.get_user_data_by_name("Kp")
+    # user_name = user_data["name"]
+    # uid = user_data["uid"]
+    # eids = user_data["eids"]
+    #
+    # emb_data = emb_tb.get_emb_data(eids[0])
+    # emb = emb_data["face_emb"]
 
     flann_server = FlannServer()
-    flann_server.build()
-    flann_server.load()
-    names = flann_server.search(embs[0])
-    print(names)
+    flann_server.reset()
+
+    # flann_server.build()
+    # flann_server.load()
+    # names = flann_server.search(emb)
+    # print(names)
