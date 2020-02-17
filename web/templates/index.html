@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<video autoplay id="video"></video>
+<canvas id="canvas"></canvas>
+<img src="{{ url_for('video_feed') }}">
+<div id="data"></div>
+
+<script>
+    const video = document.querySelector("#video");
+    const canvas = document.querySelector("#canvas");
+
+    const FPS = 10;
+
+    const hdConstraints = {
+        video: true
+    };
+
+    var frame = null;
+
+    /* capture video from camera */
+    navigator.mediaDevices.getUserMedia(hdConstraints).then((stream) => {
+        video.srcObject = stream
+    });
+
+
+    /* get frame from video */
+    setInterval(() => {
+        // draw canvas from video
+        var context = canvas.getContext('2d');
+        canvas.width = 640;
+        canvas.height = 480;
+        context.drawImage(video, video.width, video.height);
+
+        // transform img data
+        frame = canvas.toDataURL('image/png');
+
+    }, 1000/FPS);
+
+
+    /* socket */
+    var socket = io();
+
+    // connect event handler
+    socket.on('connect', function () {
+        socket.emit('connect event', {data: 'I\'m connected!'});
+    });
+
+    // message event handler
+    socket.on('message', function(data){
+        console.log(data.data);
+        $('#data').text(data.data);
+    });
+
+    // send frame to server every 1000/FPS sec
+    setInterval(function () {
+        socket.emit('update event', {data: frame});
+    }, 1000/FPS);
+
+</script>
+
+
+</body>
+</html>

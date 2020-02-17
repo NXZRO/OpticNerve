@@ -46,7 +46,7 @@ class RecognizeServer:
             self.process_state = DetectingState
             self.__draw_face_info()  # draw frame
 
-        return self.frame
+        return self.frame, self.face_IDs
 
     def __detect(self):
         self.face_locations = self.face_detector.detect(self.frame)                  # face detect

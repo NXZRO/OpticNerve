@@ -1,0 +1,51 @@
+.full-section {
+    height: 100%;
+}
+
+#video_container {
+    padding: 0;
+    background: steelblue;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+    background: darkgray;
+}
+
+#user_info_bar {
+    padding: 20px 5px 0 5px;
+    height: 100%;
+    overflow-y: scroll;
+    background: darkred;
+}
+
+.card {
+    width: 100%;
+}
+
+.card-body {
+    padding: 5px 10px;
+}
+
+.card-title {
+    margin: 5px 0 5px 0;
+    font-size: 15px;
+}
+
+.card-text {
+    margin-bottom: 5px;
+    font-size: 10px;
+}
+
+.card-btn {
+    margin-top: 10px;
+    width: 100%;
+    font-size: 12px;
+}
+
+.card-img {
+    background: dimgrey;
+    width: 100px;
+    height: 100px;
+}
