@@ -48,15 +48,15 @@ def test_delete_user(inp_user_name):
 if __name__ == '__main__':
 
     # sign up from test img base people
-    test_sign_up_dataset()
+    # test_sign_up_dataset()
 
     # sign up yourself
-    # user_name = "OwO"
+    # user_name = "HUANG TING HOU"
     # test_sign_up_user(user_name)
 
     # delete user
-    # user_name = "OwO"
-    # test_delete_user(user_name)
+    user_name = "HUANG TING HOU"
+    test_delete_user(user_name)
 
     # delete database_server
     # user_server = UserServer()
