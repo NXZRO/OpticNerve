@@ -1,35 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Required meta tags -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Title</title>
+    <!--Bootstrap CSS-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!--CSS-->
     <link rel="stylesheet" href="../static/style.css">
     <link rel="stylesheet" href="../static/recognize.css">
-    <title>recognize</title>
+
+    <!--jQuery, Popper.js, Bootstrap.js, Socket.io.js and fontawesome.js-->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+            integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/4afd8e5442.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <main class="container-fluid">
-        <div class="row full-section">
-            <div id="video_container" class="col-md-10">
-                <!-- Camera video -->
-                <img id="video" alt="video" src="{{ url_for('video_feed') }}">
-            </div>
-            <div id="user_info_bar" class="col-md-2">
-                <!-- User info card -->
 
-
-            </div>
+<main class="container-fluid">
+    <div class="row full-section">
+        <div id="video_container" class="col-md-10">
+            <!-- Camera video -->
+            <img id="video" alt="video" src="{{ url_for('video_feed') }}">
         </div>
-    </main>
+        <div id="user_info_bar" class="col-md-2">
+            <!-- User info card -->
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        </div>
+    </div>
+
+</main>
+
+
+<script>
+    /* socket */
+    var socket = io();
+
+    // connect event handler
+    socket.on('connect', function () {
+        socket.emit('connect event', {data: 'I\'m connected!'});
+    });
+
+    // log message event from server
+    socket.on('log_msg', function (data) {
+        console.log(data.data);
+    });
+
+    // receive user data msg event from server
+    socket.on('user_data_msg', function (data) {
+        console.log(data.data);
+        $(card_modal).ready(function(){
+            $("h5").text(data.data);
+        });
+        $("#user_info_bar").prepend($(card_modal));
+    });
+
+
+    var card_modal = "<div class=\"card mb-3\">\n" +
+        "                <div class=\"row no-gutters\">\n" +
+        "                    <div class=\"col-md-5 d-flex align-items-center\">\n" +
+        "                        <img src=\"\" class=\"card-img\" alt=\"user_img\">\n" +
+        "                    </div>\n" +
+        "                    <div class=\"col-md-7\">\n" +
+        "                        <div class=\"card-body\">\n" +
+        "                            <h5 class=\"card-title\"></h5>\n" +
+        "                            <p class=\"card-text\">Birth: 1999/01/01</p>\n" +
+        "                            <p class=\"card-text\">City: Taipei</p>\n" +
+        "                            <p class=\"card-text\">Brief: nothing to say</p>\n" +
+        "                            <a href=\"#\" class=\"btn btn-primary card-btn\">More</a>\n" +
+        "                        </div>\n" +
+        "                    </div>\n" +
+        "                </div>\n" +
+        "            </div>";
+
+</script>
 </body>
 </html>
