@@ -1,6 +1,6 @@
 from sign_up_server.face_capturer import FaceCapturer
 from sign_up_server.user_server import UserServer
-
+import cv2
 import os
 
 
@@ -17,26 +17,19 @@ def test_sign_up_dataset():
             user_names.append(str(id).rstrip('\n'))
 
     for i, (user_name, dir) in enumerate(zip(user_names, dirs)):
+
         print(dir)
+        img_dir = "./test_img_base/" + dir + "/"
+        face_cap.reset()
 
-        user_face_embs = face_cap.capture_test_imgs("./test_img_base/" + dir + "/")
+        for img_file in os.listdir(img_dir):
+            frame = cv2.imread(img_dir + img_file)
+            face_cap.capture_face(frame)
 
+        user_face_embs = face_cap.face_embs
         user_faces_imgs = face_cap.face_imgs
 
         user_server.new_user(user_name, user_face_embs, user_faces_imgs)  # new user
-
-
-def test_sign_up_user(inp_user_name):
-    user_server = UserServer()
-
-    user_name = inp_user_name
-
-    face_cap = FaceCapturer()
-    user_face_embs = face_cap.capture_face()
-
-    user_faces_imgs = face_cap.face_imgs
-
-    user_server.new_user(user_name, user_face_embs, user_faces_imgs)
 
 
 def test_delete_user(inp_user_name):
@@ -48,19 +41,12 @@ def test_delete_user(inp_user_name):
 if __name__ == '__main__':
 
     # sign up from test img base people
-    # test_sign_up_dataset()
-
-    # sign up yourself
-    # user_name = "HUANG TING HOU"
-    # test_sign_up_user(user_name)
+    test_sign_up_dataset()
 
     # delete user
-    user_name = "HUANG TING HOU"
-    test_delete_user(user_name)
+    # user_name = "OWO"
+    # test_delete_user(user_name)
 
-    # delete database_server
-    # user_server = UserServer()
-    # user_server.database_server.clear()
 
 
 

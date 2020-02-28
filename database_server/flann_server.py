@@ -100,21 +100,6 @@ class FlannServer:
 
 
 if __name__ == '__main__':
-    # user_tb = UserTable()
-    # emb_tb = EmbTable()
-    #
-    # user_data = user_tb.get_user_data_by_name("Kp")
-    # user_name = user_data["name"]
-    # uid = user_data["uid"]
-    # eids = user_data["eids"]
-    #
-    # emb_data = emb_tb.get_emb_data(eids[0])
-    # emb = emb_data["face_emb"]
-
+    # remove all data
     flann_server = FlannServer()
     flann_server.reset()
-
-    # flann_server.build()
-    # flann_server.load()
-    # names = flann_server.search(emb)
-    # print(names)

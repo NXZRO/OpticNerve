@@ -122,6 +122,7 @@ class EmbTable(MongoServer):
 
 
 if __name__ == '__main__':
+    # remove all data
     db = MongoServer()
     db.reset()
 

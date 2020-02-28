@@ -1,4 +1,6 @@
 from database_server.mongo_server import *
+from database_server.img_server import *
+from database_server.flann_server import *
 import numpy as np
 
 
@@ -54,22 +56,27 @@ def remove_user(user_name):
         print("remove user success ...")
 
 
+def clear_database():
+    db = MongoServer()
+    db.reset()
+
+    img_server = ImgServer()
+    img_server.reset()
+
+    flann_server = FlannServer()
+    flann_server.reset()
+
+
 if __name__ == '__main__':
     db = MongoServer()
-    # db.reset()
+    # clear_database()
 
     # initial table
     id_tb = IdTable()
     emb_tb = EmbTable()
     user_tb = UserTable()
 
-    # user_name = "Jack"
-    # face_embs = [np.random.rand(1, 3) for _ in range(3)]
-    # new_user(user_name, face_embs)
-
-    # remove_user(user_name)
-
     # show tables
     id_tb.show_table()
     user_tb.show_table()
-    emb_tb.show_table()
+    # emb_tb.show_table()
