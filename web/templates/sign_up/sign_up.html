@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <!-- font style -->
+    <link href="https://fonts.googleapis.com/css?family=Noto+Serif&display=swap" rel="stylesheet">
+
     <!--CSS-->
     <link rel="stylesheet" href="../../static/style.css">
-    <link rel="stylesheet" href="../../static/recognize.css">
+    <link rel="stylesheet" href="../../static/sign_up.css">
 
     <!--jQuery, Popper.js, Bootstrap.js-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -22,28 +25,47 @@
 </head>
 <body>
 
-<div id="info_step">
-    <div class="form-group">
-        <label for="username">Input user name</label>
-        <input id="username" class="form-control" type="text" placeholder="username">
-        <a id="next_btn" class="btn btn-primary" href="#next">next</a>
+
+<div id="info_step" class="container step-block-center">
+    <div class="row justify-content-center">
+        <div class="col-sm-8" align="center">
+            <label for="username" class="label-xl">Input Your Name &#x1F606;</label>
+            <input id="username" class="form-control input" type="text" placeholder="username">
+            <a id="next_btn" class="btn btn-primary" href="#next">next</a>
+        </div>
     </div>
 </div>
 
 
-<div id="capture_step">
-    <h1>Capture face</h1>
-    <h2>face number: 0</h2>
-
-    <img src="{{ url_for('video_feed') }}">
-    <a id="capture_btn" class="btn btn-primary" href="#capture">capture</a>
-    <a id="finish_btn" class="btn btn-primary" href="#finish">finish</a>
+<div id="capture_step" class="container">
+    <div class="row justify-content-center">
+        <div class="col-sm-8" align="center">
+            <label class="label-lg">Capture Face</label>
+        </div>
+        <div class="col-sm-8" align="center">
+            <label id="face_num_label" class="label-md">face number: 0</label>
+        </div>
+        <div class="col-sm-8" align="center">
+            <img class="video" src="{{ url_for('video_feed') }}">
+        </div>
+        <div class="col-sm-8" align="center">
+            <a id="capture_btn" class="btn btn-primary" href="#capture">capture</a>
+            <a id="finish_btn" class="btn btn-primary" href="#finish">finish</a>
+        </div>
+    </div>
 </div>
 
-<div id="finish_step">
-    <h1>Finish</h1>
-</div>
 
+<div id="finish_step" class="container step-block-center">
+    <div class="row justify-content-center">
+        <div class="col-sm-10" align="center">
+            <label class="label-xl">Sign Up Successful &#x1F609;</label>
+        </div>
+        <div class="col-sm-10" align="center">
+            <label class="label-xl">Thank You</label>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -69,7 +91,7 @@
             if(cap_num > 0){
                 $('#finish_btn').show();
             }
-            $("h2").text("face number: " + cap_num);
+            $("#face_num_label").text("face number: " + cap_num);
 
         });
     });
