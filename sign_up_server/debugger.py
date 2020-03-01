@@ -45,14 +45,14 @@ def test_show_user():
 if __name__ == '__main__':
 
     # sign up from test img base people
-    test_sign_up_dataset()
+    # test_sign_up_dataset()
 
     # delete user
     # user_name = "jacks"
     # test_delete_user(user_name)
 
     # show user
-    # test_show_user()
+    test_show_user()
 
 
 

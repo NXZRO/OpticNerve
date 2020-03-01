@@ -29,13 +29,13 @@ def gen():
     while True:
         ret, frame = camera.read()  # get frame
 
+        # frame = cv2.resize(frame, (1280, 720))
+
         frame, face_ids = recognizer.recognize(frame)
 
         td = threading.Thread(target=push_user_data_msg, args=(face_ids,))
 
         td.start()
-
-        frame = cv2.resize(frame, (1280, 720))
 
         img_array = cv2.imencode('.jpg', frame)[1]  # encode frame to bytes
         img_bytes = img_array.tostring()
@@ -55,16 +55,17 @@ def push_user_data_msg(face_ids):
     print("Child thread:")
     print(face_id_cache)
     print(face_ids)
-    t = int(time.time() - t0)
-
-    if t % 10 == 0:
-        face_id_cache.clear()
 
     for id in face_ids:
         if id not in face_id_cache:
-            face_id_cache.append(id)
             if id != '':
-                socketio.emit('user_data_msg', {'data': id})
+                face_id_cache.append(id)
+                socketio.emit('append_user_card', {'data': id})
+
+    for idx, cache_id in enumerate(face_id_cache):
+        if cache_id not in face_ids:
+            face_id_cache.pop(idx)
+            socketio.emit('remove_user_card', {'data': cache_id})
 
 
 @app.route('/')

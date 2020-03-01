@@ -56,17 +56,25 @@
         console.log(data.data);
     });
 
-    // receive user data msg event from server
-    socket.on('user_data_msg', function (data) {
+    // receive append user card event from server
+    socket.on('append_user_card', function (data) {
         console.log(data.data);
         $(card_modal).ready(function(){
             $("h5").text(data.data);
+            $('#card').attr('id', data.data);
         });
         $("#user_info_bar").prepend($(card_modal));
     });
 
 
-    var card_modal = "<div class=\"card mb-3\">\n" +
+    // receive remove user card event from server
+    socket.on('remove_user_card', function (data) {
+        console.log(data.data);
+        $("#" + data.data).remove();
+    });
+
+
+    var card_modal = "<div id='card' class=\"card mb-3\">\n" +
         "                <div class=\"row no-gutters\">\n" +
         "                    <div class=\"col-md-5 d-flex align-items-center\">\n" +
         "                        <img src=\"\" class=\"card-img\" alt=\"user_img\">\n" +
