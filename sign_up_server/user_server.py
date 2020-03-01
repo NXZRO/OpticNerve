@@ -65,3 +65,14 @@ class UserServer:
             self.img_server.remove_img(user_name)
 
             print("remove user success ...")
+
+    def show_user(self):
+        self.user_tb.show_table()
+
+
+    def check_user_name_is_exist(self, user_name):
+        user_data = self.user_tb.get_user_data_by_name(user_name)
+        if user_data is None:
+            return False
+        else:
+            return True

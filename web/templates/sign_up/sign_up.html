@@ -78,8 +78,12 @@
         inp_username = $("#username").val();
         $.post("/info", {username: inp_username}, function (data) {
             console.log(data);
-            $('#info_step').hide();
-            $('#capture_step').show();
+            if (data.status == true) {
+                $('#info_step').hide();
+                $('#capture_step').show();
+            } else {
+                alert(data.info);
+            }
         });
 
     });
@@ -88,7 +92,7 @@
         $.getJSON("/capture", function (data) {
             console.log(data);
             cap_num = data.capture_num;
-            if(cap_num > 0){
+            if (cap_num > 0) {
                 $('#finish_btn').show();
             }
             $("#face_num_label").text("face number: " + cap_num);

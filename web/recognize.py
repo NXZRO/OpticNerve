@@ -69,7 +69,7 @@ def push_user_data_msg(face_ids):
 
 @app.route('/')
 def index():
-    return render_template('/recognize/test.html')
+    return render_template('/recognize/recognize.html')
 
 
 if __name__ == '__main__':

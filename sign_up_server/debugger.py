@@ -34,8 +34,12 @@ def test_sign_up_dataset():
 
 def test_delete_user(inp_user_name):
     user_server = UserServer()
-
     user_server.remove_user(inp_user_name)
+
+
+def test_show_user():
+    user_server = UserServer()
+    user_server.show_user()
 
 
 if __name__ == '__main__':
@@ -44,8 +48,12 @@ if __name__ == '__main__':
     test_sign_up_dataset()
 
     # delete user
-    # user_name = "OWO"
+    # user_name = "jacks"
     # test_delete_user(user_name)
+
+    # show user
+    # test_show_user()
+
 
 
 

@@ -21,9 +21,9 @@ def gen():
     while True:
         ret, frame = camera.read()  # get frame
 
-        frame = face_capturer.detect_face(frame)
+        frame = cv2.resize(frame, (480, 480))
 
-        # frame, face_ids = recognizer.recognize(frame)
+        frame = face_capturer.detect_face(frame)
 
         img_array = cv2.imencode('.jpg', frame)[1]  # encode frame to bytes
         img_bytes = img_array.tostring()
@@ -48,11 +48,16 @@ def info():
 
     username = request.values['username']
 
-    user.name = username
+    exist = user_server.check_user_name_is_exist(username)
 
-    print("username: {}".format(username))
+    if exist:
+        print("username: '{}' is exist".format(username))
+        data = {'status': False, 'info': "username '{}' is exist".format(username)}
 
-    data = {'info': username}
+    else:
+        user.name = username
+        print("username: {}".format(username))
+        data = {'status': True, 'info': username}
 
     return jsonify(data)
 
@@ -76,8 +81,6 @@ def finish():
 
     for i, img in enumerate(face_capturer.face_imgs):
         cv2.imwrite("./tmp/" + str(i) + ".jpg", img)
-
-    print(user.name)
 
     user.face_embs = face_capturer.face_embs
 
