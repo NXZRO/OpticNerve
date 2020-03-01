@@ -15,6 +15,7 @@ class UserServer:
 
         if user_data is not None:
             print("user '{}' is exist ...".format(user_name))
+            return False
 
         else:
             print("new user '{}' ...".format(user_name))
@@ -43,6 +44,7 @@ class UserServer:
                 self.img_server.save_img(user_name + "/" + str(i) + ".jpg", img)
 
             print("new user success ...")
+            return True
 
     def remove_user(self, user_name):
 
@@ -50,6 +52,7 @@ class UserServer:
 
         if user_data is None:
             print("user '{}' isn't exist ...".format(user_name))
+            return False
 
         else:
             print("remove user '{}' ...".format(user_name))
@@ -65,10 +68,10 @@ class UserServer:
             self.img_server.remove_img(user_name)
 
             print("remove user success ...")
+            return True
 
     def show_user(self):
         self.user_tb.show_table()
-
 
     def check_user_name_is_exist(self, user_name):
         user_data = self.user_tb.get_user_data_by_name(user_name)

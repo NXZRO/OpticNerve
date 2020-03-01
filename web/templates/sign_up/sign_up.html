@@ -78,11 +78,11 @@
         inp_username = $("#username").val();
         $.post("/info", {username: inp_username}, function (data) {
             console.log(data);
-            if (data.status == true) {
+            if (data.result == true) {
                 $('#info_step').hide();
                 $('#capture_step').show();
             } else {
-                alert(data.info);
+                alert(data.msg);
             }
         });
 
@@ -91,7 +91,7 @@
     $("#capture_btn").click(function () {
         $.getJSON("/capture", function (data) {
             console.log(data);
-            cap_num = data.capture_num;
+            cap_num = data.value;
             if (cap_num > 0) {
                 $('#finish_btn').show();
             }

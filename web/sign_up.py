@@ -52,12 +52,16 @@ def info():
 
     if exist:
         print("username: '{}' is exist".format(username))
-        data = {'status': False, 'info': "username '{}' is exist".format(username)}
+        data = {'resp': "/info",
+                'result': False,
+                'msg': "username '{}' is exist".format(username)}
 
     else:
         user.name = username
         print("username: {}".format(username))
-        data = {'status': True, 'info': username}
+        data = {'resp': "/info",
+                'result': True,
+                'msg': "check username '{}' is ok".format(username)}
 
     return jsonify(data)
 
@@ -70,7 +74,9 @@ def capture():
 
     ok = face_capturer.capture_face(frame)
 
-    data = {'capture_result': ok, 'capture_num': face_capturer.capture_face_num}
+    data = {'resp': '/capture',
+            'result': ok,
+            'value': face_capturer.capture_face_num}
 
     return jsonify(data)
 
@@ -86,11 +92,12 @@ def finish():
 
     user.faces_imgs = face_capturer.face_imgs
 
-    user_server.new_user(user.name, user.face_embs, user.faces_imgs)
+    ok = user_server.new_user(user.name, user.face_embs, user.faces_imgs)
 
     face_capturer.reset()
 
-    data = {'sign_up_finish': True}
+    data = {'resp': '/finish',
+            'result': ok}
 
     return jsonify(data)
 
