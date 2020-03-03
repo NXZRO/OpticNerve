@@ -29,7 +29,7 @@ def gen():
     while True:
         ret, frame = camera.read()  # get frame
 
-        # frame = cv2.resize(frame, (1280, 720))
+        frame = cv2.resize(frame, (1280, 720))
 
         frame, face_ids = recognizer.recognize(frame)
 

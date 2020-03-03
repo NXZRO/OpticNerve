@@ -1,21 +1,12 @@
-.full-section {
-    height: 100%;
-}
-
-#video_container {
-    padding: 0;
-    background: steelblue;
-}
-
-#video {
-    background: darkgray;
+.video-full-screen {
+    height: 100vh;
 }
 
 #user_info_bar {
-    padding: 20px 5px 0 5px;
+    display: block;
     height: 100%;
+    padding: 20px 5px 0 5px;
     overflow-y: scroll;
-    background: darkred;
 }
 
 .card {
@@ -46,4 +37,21 @@
     background: dimgrey;
     width: 100px;
     height: 100px;
+}
+
+/* custom scrollbar */
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #2d2d2d;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: darkgrey;
 }
