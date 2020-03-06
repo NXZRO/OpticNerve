@@ -64,7 +64,6 @@ if __name__ == '__main__':
 
         else:
             print("detecting ...")
-            tracker_flag = 0  # set next frame use recognizing
             draw_face_info(frame, face_IDs, face_locations, DetectingState, curr_face_num)  # draw frame
 
         cv2.imshow('frame', frame)  # show frame in window
