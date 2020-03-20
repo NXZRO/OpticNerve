@@ -26,22 +26,21 @@
     <script src="https://kit.fontawesome.com/4afd8e5442.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="container-fluid p-0 vw-100">
-    <div class="row m-0 vh-100">
-        <!-- video container-->
-        <div id="video_container" class="col-md-10 p-0 d-flex align-items-center justify-content-center">
-            <!-- web cam video -->
-            <img id="video" class="img-fluid" alt="video" src="{{ url_for('video_feed') }}">
+
+<div class="container-fluid vh-100">
+    <div class="row vh-100">
+        <!--video container-->
+        <div class="col vh-100 d-flex justify-content-center align-items-center">
+            <img class="vh-100" src="{{ url_for('video_feed') }}" alt="video">
         </div>
 
         <!-- user info bar -->
-        <div id="user_info_bar" class="col-md-2 p-0">
+        <div id="user_info_bar" class="">
             <!-- user card -->
 
         </div>
     </div>
 </div>
-
 
 <script>
     /* socket */
@@ -60,7 +59,7 @@
     // receive append user card event from server
     socket.on('append_user_card', function (data) {
         console.log(data.data);
-        $(card_modal).ready(function(){
+        $(card_modal).ready(function () {
             $("h5").text(data.data);
             $('#card').attr('id', data.data);
         });
@@ -75,23 +74,23 @@
     });
 
 
-    var card_modal = "<!-- user card -->\n" +
-        "<div id=\"card\" class=\"card mb-3\">\n" +
-        "    <div class=\"row no-gutters\">\n" +
-        "        <div class=\"col-xl-5 d-flex align-items-center justify-content-center\">\n" +
-        "            <img src=\"\" class=\"card-img\" alt=\"user_img\">\n" +
-        "        </div>\n" +
-        "        <div class=\"col-xl-7\">\n" +
-        "            <div class=\"card-body\">\n" +
-        "                <h5 class=\"card-title\">Tom</h5>\n" +
-        "                <p class=\"card-text\">Birth: 1999/01/01</p>\n" +
-        "                <p class=\"card-text\">City: Taipei</p>\n" +
-        "                <p class=\"card-text\">Brief: nothing to say</p>\n" +
-        "                <a href=\"#\" class=\"btn btn-primary card-btn\">More</a>\n" +
-        "            </div>\n" +
-        "        </div>\n" +
-        "    </div>\n" +
-        "</div>";
+    var card_modal = "<div id=\"card\" class=\"card\">\n" +
+        "                <div class=\"row no-gutters\">\n" +
+        "                    <div class=\"col d-flex align-items-center justify-content-center\">\n" +
+        "                        <img src=\"\" class=\"card-img\" alt=\"user_img\">\n" +
+        "                    </div>\n" +
+        "                    <div class=\"col\">\n" +
+        "                        <div class=\"card-body\">\n" +
+        "                            <h5 class=\"card-title\">Tom</h5>\n" +
+        "                            <p class=\"card-text\">Student</p>\n" +
+        "                            <p class=\"card-text\">Computer Science & Information Engineering</p>\n" +
+        "                            <p class=\"card-text\">ID: 406410927</p>\n" +
+        "                            <p class=\"card-text\">Fri Mar 20 2020 17:51:54 GMT+0800 (台北標準時間)</p>\n" +
+        "                            <a href=\"#\" class=\"btn btn-primary card-btn\">More</a>\n" +
+        "                        </div>\n" +
+        "                    </div>\n" +
+        "                </div>\n" +
+        "            </div>"
 
 </script>
 </body>

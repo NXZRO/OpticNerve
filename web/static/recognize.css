@@ -1,16 +1,18 @@
-.video-full-screen {
-    height: 100vh;
-}
-
 #user_info_bar {
+    position: absolute;
+    top:0;
+    right: 0;
     display: block;
     height: 100%;
-    padding: 20px 5px 0 5px;
     overflow-y: scroll;
 }
 
 .card {
+    background: rgba(255,255,255,0.1);
+    color: white;
     width: 100%;
+    margin-bottom: 10px;
+    font-size: 10px;
 }
 
 .card-body {
@@ -19,39 +21,25 @@
 
 .card-title {
     margin: 5px 0 5px 0;
-    font-size: 15px;
 }
 
 .card-text {
     margin-bottom: 5px;
-    font-size: 10px;
 }
 
 .card-btn {
     margin-top: 10px;
     width: 100%;
-    font-size: 12px;
 }
 
 .card-img {
     background: dimgrey;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
 }
 
 /* custom scrollbar */
 /* width */
 ::-webkit-scrollbar {
-    width: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #2d2d2d;
-    border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: darkgrey;
+    display: none;
 }

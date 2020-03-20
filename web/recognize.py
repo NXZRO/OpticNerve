@@ -24,14 +24,16 @@ def connect(json):
 
 
 def gen():
+
     camera = cv2.VideoCapture(0)  # 0 -> first camera
 
     while True:
+        a = time.time()
         ret, frame = camera.read()  # get frame
 
-        frame = cv2.resize(frame, (1280, 720))
-
         frame, face_ids = recognizer.recognize(frame)
+
+        frame = cv2.resize(frame, (1280, 720))
 
         td = threading.Thread(target=push_user_data_msg, args=(face_ids,))
 
@@ -44,9 +46,13 @@ def gen():
 
         td.join()
 
+        b = time.time()
+        print(b-a)
+
 
 @app.route('/video_feed')
 def video_feed():
+
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
