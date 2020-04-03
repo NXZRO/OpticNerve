@@ -1,5 +1,5 @@
 import cv2
-from recognize_server.recognize import RecognizeServer
+from face_recognize.face_recognizer import FaceRecognizer
 import time
 
 if __name__ == '__main__':
@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     f = 0
 
-    server = RecognizeServer()
+    recognizer = FaceRecognizer()
 
     camera = cv2.VideoCapture(0)  # 0 -> first camera
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
         t1 = time.clock()
 
-        frame = server.recognize(frame)  # recognize frame
+        frame, face_ids = recognizer.recognize(frame)  # recognize frame
 
         t2 = time.clock()
 
@@ -32,7 +32,7 @@ if __name__ == '__main__':
             else:
                 max_cost = cost
 
-        print(cost)
+        print("\ncost: {} sec".format(cost))
         print("first max cost: {} sec".format(first_max_cost))
         print("max cost: {} sec".format(max_cost))
 
