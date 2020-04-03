@@ -48,17 +48,9 @@ class FaceRecognizer:
             face = self.inp_frame[y:y + h, x:x + w]
             face_margin = np.zeros((h + margin * 2, w + margin * 2, 3), dtype="uint8")
 
-            try:
-                face_margin[margin:margin + h, margin:margin + w] = face
-            except ValueError:
-                # Camera shaking cause detect error location, and lead to extract error face shape
-                print('traceback __face_extract func')
-                print('{} : could not broadcast input array from shape {} into shape {}:'.format(ValueError, face.shape,
-                                                                                                 face_margin.shape))
-                self.raw_faces = None
-                break
-            else:
-                self.raw_faces.append(face_margin)
+            face_margin[margin:margin + h, margin:margin + w] = face
+
+            self.raw_faces.append(face_margin)
 
     def __preprocess_face(self):
         image_size = 160  # facenet model need 160×160 image size

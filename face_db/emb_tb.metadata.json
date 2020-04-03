@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"face_db.emb_tb"},{"v":{"$numberInt":"2"},"unique":true,"key":{"eid":{"$numberDouble":"1.0"}},"name":"eid_1","ns":"face_db.emb_tb"}],"uuid":"982e42de0d9c46fda296a969b19a7647"}

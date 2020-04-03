@@ -1,6 +1,6 @@
 from sign_up_server.face_capturer import FaceCapturer
 from sign_up_server.user_server import UserServer
-
+import cv2
 import os
 
 
@@ -16,38 +16,30 @@ def test_sign_up_dataset():
         for id in fp:
             user_names.append(str(id).rstrip('\n'))
 
-    for user_name, dir in zip(user_names, dirs):
-        print(dir)
-        user_face_embs = face_cap.capture_test_imgs("./test_img_base/" + dir + "/")
+    for i, (user_name, dir) in enumerate(zip(user_names, dirs)):
 
+        print(dir)
+        img_dir = "./test_img_base/" + dir + "/"
+        face_cap.reset()
+
+        for img_file in os.listdir(img_dir):
+            frame = cv2.imread(img_dir + img_file)
+            face_cap.capture_face(frame)
+
+        user_face_embs = face_cap.face_embs
         user_faces_imgs = face_cap.face_imgs
 
         user_server.new_user(user_name, user_face_embs, user_faces_imgs)  # new user
 
-    print(user_server.database_io.load_user_table())
 
-    print(user_server.database_io.load_user_name_table())
-
-    print(user_server.database_io.load_emb_table())
-
-
-def test_sign_up_user(inp_user_name):
+def test_delete_user(inp_user_name):
     user_server = UserServer()
+    user_server.remove_user(inp_user_name)
 
-    user_name = inp_user_name
 
-    face_cap = FaceCapturer()
-    user_face_embs = face_cap.capture_face()
-
-    user_faces_imgs = face_cap.face_imgs
-
-    user_server.new_user(user_name, user_face_embs, user_faces_imgs)
-
-    print(user_server.database_io.load_user_table())
-
-    print(user_server.database_io.load_user_name_table())
-
-    print(user_server.database_io.load_emb_table())
+def test_show_user():
+    user_server = UserServer()
+    user_server.show_user()
 
 
 if __name__ == '__main__':
@@ -55,9 +47,14 @@ if __name__ == '__main__':
     # sign up from test img base people
     # test_sign_up_dataset()
 
-    # sign up yourself
-    user_name = "OWO"
-    test_sign_up_user(user_name)
+    # delete user
+    # user_name = "jacks"
+    # test_delete_user(user_name)
+
+    # show user
+    test_show_user()
+
+
 
 
 

@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
         t1 = time.clock()
 
-        frame = server.recognize(frame)  # recognize frame
+        frame, face_ids = server.recognize(frame)  # recognize frame
 
         t2 = time.clock()
 

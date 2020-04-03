@@ -1,8 +1,7 @@
 import cv2
 from face_recognize.face_detector import FaceDetector
 from face_recognize.face_recognizer import FaceRecognizer
-from face_recognize.face_tracker import FaceTracker
-from database_server.db_server import DataBaseServer
+from database_server.flann_server import FlannServer
 
 
 DetectingState = 0
@@ -22,78 +21,43 @@ class RecognizeServer:
         self.face_IDs = []
         self.face_dict = {}
 
-        self.db_server = DataBaseServer()
+        self.flann_server = FlannServer()
         self.face_detector = FaceDetector()
         self.face_recognizer = FaceRecognizer()
-        self.face_tracker = None
 
-        self.db_server.build_database()
-        self.db_server.load_database()
+        self.flann_server.build()
+        self.flann_server.load()
 
     def recognize(self, frame):
         self.frame = frame
         self.__detect()
 
         if self.curr_face_num:  # there are faces in the frame
-
-            if self.tracker_flag == 0 or self.curr_face_num != self.prev_face_num:
-                # no tracker or no new face in the frame
-                print("recognizing ...")
-                self.__recognize()
-                self.process_state = RecognizingState
-                self.__draw_face_info()  # draw frame
-
-            else:
-                print("tracking ...")
-                self.__track()
-                self.process_state = TrackingState
-                self.__draw_face_info()  # draw frame
+            print("recognizing ...")
+            self.face_IDs = []
+            self.__recognize()
+            self.process_state = RecognizingState
+            self.__draw_face_info()  # draw frame
 
         else:
             print("detecting ...")
+            self.face_IDs = []
             self.tracker_flag = 0
             self.process_state = DetectingState
             self.__draw_face_info()  # draw frame
 
-        return self.frame
+        return self.frame, self.face_IDs
 
     def __detect(self):
         self.face_locations = self.face_detector.detect(self.frame)                  # face detect
         self.curr_face_num = len(self.face_locations)
-        self.face_IDs = []
 
     def __recognize(self):
         face_embs = self.face_recognizer.recognize(self.frame, self.face_locations)  # face recognize
 
         if face_embs is not None:
-            print("searching database...")
-            self.face_IDs = self.db_server.search_database(face_embs)                # search data base
-
-            print("setting tracker...")
-            self.tracker_flag = 1                                                    # set next frame use tracking
-            self.prev_face_num = self.curr_face_num                                  # record face num
-
-            self.face_dict = self.__build_face_dict()
-            self.face_tracker = FaceTracker(self.frame, self.face_dict)              # initial trackers
-
-    def __track(self):
-        ok, self.face_dict = self.face_tracker.track(self.frame)  # face track
-
-        self.face_IDs, self.face_locations = self.__unzip_face_dict()
-
-        if not ok:
-            self.tracker_flag = 0  # set next frame use recognizing
-
-    def __build_face_dict(self):
-        return {id: loc for id, loc in zip(self.face_IDs, self.face_locations)}
-
-    def __unzip_face_dict(self):
-        ks = []
-        vs = []
-        for k, v in self.face_dict.items():
-            ks.append(k)
-            vs.append(v)
-        return ks, vs
+            print("searching database_server...")
+            self.face_IDs = self.flann_server.search(face_embs)                # search data base
 
     def __draw_face_info(self):
         color_dict = {0: (255, 0, 0), 1: (0, 255, 0), 2: (0, 0, 255)}
@@ -111,12 +75,13 @@ class RecognizeServer:
                     1, color, 1, cv2.LINE_AA)
 
         if self.face_IDs:
-            for (face_ID, face_loc) in zip(self.face_IDs, self.face_locations):
+            for i, (face_ID, face_loc) in enumerate(zip(self.face_IDs, self.face_locations)):
                 (x, y, w, h) = face_loc
-                # draw face box
-                cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)
 
-                # draw face id
+                if face_ID == "":
+                    face_ID = "Unknow" + str(i)
+
+                cv2.rectangle(self.frame, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(self.frame, str(face_ID), (x, y - 20), cv2.FONT_HERSHEY_DUPLEX,
                             1, color, 1, cv2.LINE_AA)
 
