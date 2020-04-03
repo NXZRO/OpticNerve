@@ -1,7 +1,7 @@
 from flask import Flask, render_template, Response, request
 from flask import jsonify
 import cv2
-from sign_up_server.face_capturer import FaceCapturer
+from face_recognize.face_recognizer import FaceRecognizer
 from sign_up_server.user_server import UserServer
 from sign_up_server.user import User
 app = Flask(__name__)
@@ -13,7 +13,9 @@ user_server = UserServer()
 
 user = User()
 
-face_capturer = FaceCapturer()
+tmp_user = User()
+
+recognizer = FaceRecognizer(recognize_flag=False)
 
 
 def gen():
@@ -23,7 +25,11 @@ def gen():
 
         frame = cv2.resize(frame, (480, 480))
 
-        frame = face_capturer.detect_face(frame)
+        frame, face_embs = recognizer.embedding(frame)
+
+        tmp_user.face_embs = face_embs
+
+        tmp_user.face_imgs = frame
 
         img_array = cv2.imencode('.jpg', frame)[1]  # encode frame to bytes
         img_bytes = img_array.tostring()
@@ -70,13 +76,12 @@ def info():
 def capture():
     print("capture")
 
-    ret, frame = camera.read()   # capture frame
-
-    ok = face_capturer.capture_face(frame)
+    user.face_imgs.append(tmp_user.face_imgs)
+    user.face_embs.append(tmp_user.face_embs[0])
 
     data = {'resp': '/capture',
-            'result': ok,
-            'value': face_capturer.capture_face_num}
+            'result': True,
+            'value': len(user.face_imgs)}
 
     return jsonify(data)
 
@@ -85,16 +90,11 @@ def capture():
 def finish():
     print("finish")
 
-    for i, img in enumerate(face_capturer.face_imgs):
-        cv2.imwrite("./tmp/" + str(i) + ".jpg", img)
+    ok = user_server.new_user(user.name, user.face_embs, user.face_imgs)
 
-    user.face_embs = face_capturer.face_embs
-
-    user.faces_imgs = face_capturer.face_imgs
-
-    ok = user_server.new_user(user.name, user.face_embs, user.faces_imgs)
-
-    face_capturer.reset()
+    user.name = ""
+    user.face_imgs = []
+    user.face_embs = []
 
     data = {'resp': '/finish',
             'result': ok}

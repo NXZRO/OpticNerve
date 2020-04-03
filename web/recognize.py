@@ -4,13 +4,13 @@ import cv2
 import threading
 import time
 
-from recognize_server.recognize import RecognizeServer
+from face_recognize.face_recognizer import FaceRecognizer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-recognizer = RecognizeServer()
+recognizer = FaceRecognizer()
 
 face_id_cache = []
 

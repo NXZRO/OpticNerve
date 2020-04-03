@@ -134,4 +134,4 @@ if __name__ == '__main__':
     # show tables
     id_tb.show_table()
     user_tb.show_table()
-    emb_tb.show_table()
+    # emb_tb.show_table()

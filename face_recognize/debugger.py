@@ -1,6 +1,7 @@
 import cv2
 from face_recognize.face_detector import FaceDetector
-from face_recognize.face_recognizer import FaceRecognizer
+from face_recognize.face_embedder import FaceRecognizer
+import time
 
 DetectingState = 0
 RecognizingState = 1
@@ -44,22 +45,29 @@ if __name__ == '__main__':
     face_detector = FaceDetector()
     face_recognizer = FaceRecognizer()
 
-    camera = cv2.VideoCapture(0)  # 0 -> first camera
+    camera = cv2.VideoCapture(0)  # Fish -> first camera
 
     while True:
 
         ret, frame = camera.read()  # get frame
 
+        a = time.time()
         face_locations = face_detector.detect(frame)  # face detect
+        b = time.time()
+        print("detect: {} sec".format(b - a))
 
         curr_face_num = len(face_locations)
 
-        face_IDs = ["Detect"+str(i) for i in range(curr_face_num)]
+        face_IDs = ["Detect" + str(i) for i in range(curr_face_num)]
         print(face_IDs)
 
         if curr_face_num:  # there are faces in the frame
             print("recognizing no search databse...")
+            a = time.time()
             face_embs = face_recognizer.recognize(frame, face_locations)  # face recognize
+            b = time.time()
+            print("recog: {} sec".format(b - a))
+
             draw_face_info(frame, face_IDs, face_locations, RecognizingState, curr_face_num)  # draw frame
 
         else:
@@ -67,6 +75,8 @@ if __name__ == '__main__':
             draw_face_info(frame, face_IDs, face_locations, DetectingState, curr_face_num)  # draw frame
 
         cv2.imshow('frame', frame)  # show frame in window
+
+        cv2.imwrite('test2.jpg', frame)
 
         # press 'q' to stop
         if cv2.waitKey(1) & 0xFF == ord('q'):
