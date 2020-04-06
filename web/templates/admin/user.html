@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="card" class="card">
+    <div class="row no-gutters">
+        <div class="col d-flex align-items-center justify-content-center">
+            {% for user_img_url in user_img_urls %}
+                <img src="{{ user_img_url }}" class="card-img" alt="user_img">
+            {%- endfor %}
+        </div>
+        <div class="col">
+            <div class="card-body">
+                <h5 class="card-title">Name: {{ user.name }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

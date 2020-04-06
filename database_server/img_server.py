@@ -16,6 +16,14 @@ class ImgServer:
         img = cv2.imread(self.__Img_Base_Path + file_name)
         return img
 
+    def load_imgs(self, dir_name):
+        dir = self.__Img_Base_Path + "/" + dir_name
+        imgs = []
+        files = os.listdir(dir)
+        for file in files:
+            imgs.append(cv2.imread(dir + "/" + file))
+        return imgs
+
     def save_img(self, file_name, frame):
         dir = file_name.rsplit("/", 1)
 
@@ -38,5 +46,4 @@ class ImgServer:
 if __name__ == '__main__':
     # remove all data
     img_server = ImgServer()
-    img_server.reset()
-
+    # img_server.reset()

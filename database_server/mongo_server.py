@@ -3,6 +3,7 @@ from pymongo import MongoClient
 USER_TABLE = "user_tb"
 EMB_TABLE = "emb_tb"
 ID_TABLE = "id_tb"
+LOG_TABLE = "log_tb"
 
 
 class MongoServer:
@@ -12,11 +13,13 @@ class MongoServer:
         self.__id_tb = self.db[ID_TABLE]
         self.__user_tb = self.db[USER_TABLE]
         self.__emb_tb = self.db[EMB_TABLE]
+        self.__log_tb = self.db[LOG_TABLE]
 
     def reset(self):
         self.__id_tb.remove({})
         self.__user_tb.remove({})
         self.__emb_tb.remove({})
+        self.__log_tb.remove({})
 
         initial_id_state = {"uid": 0, "eid": 0}
         self.__id_tb.insert_one(initial_id_state)
@@ -75,6 +78,12 @@ class UserTable(MongoServer):
             user_data = data
         return user_data
 
+    def get_users(self):
+        users = []
+        for user in self.__user_tb.find():
+            users.append(user)
+        return users
+
     def remove_user(self, uid):
         self.__user_tb.remove({"uid": uid})
 
@@ -121,17 +130,38 @@ class EmbTable(MongoServer):
             print(tb)
 
 
+class LogTable(MongoServer):
+    def __init__(self):
+        super().__init__()
+        self.__log_tb = self.db[LOG_TABLE]
+
+    def insert_user_log(self, data):
+        self.__log_tb.insert_one(data)
+
+    def get_user_logs(self):
+        user_logs = []
+        for user_log in self.__log_tb.find():
+            user_logs.append(user_log)
+        return user_logs
+
+    def show_table(self):
+        for tb in self.__log_tb.find():
+            print(tb)
+
+
 if __name__ == '__main__':
     # remove all data
     db = MongoServer()
-    db.reset()
+    # db.reset()
 
     # initial table
     id_tb = IdTable()
     emb_tb = EmbTable()
     user_tb = UserTable()
+    log_tb = LogTable()
 
     # show tables
     id_tb.show_table()
     user_tb.show_table()
+    log_tb.show_table()
     # emb_tb.show_table()

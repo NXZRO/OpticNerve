@@ -1,14 +1,18 @@
 from flask import Flask, render_template, Response
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 import cv2
 import threading
 import time
 
 from face_recognize.face_recognizer import FaceRecognizer
+from user_service.user_server import UserServer
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+
+user_server = UserServer()
 
 recognizer = FaceRecognizer()
 
@@ -35,7 +39,7 @@ def gen():
 
         frame = cv2.resize(frame, (1280, 720))
 
-        td = threading.Thread(target=push_user_data_msg, args=(face_ids,))
+        td = threading.Thread(target=log_user, args=(face_ids,))
 
         td.start()
 
@@ -55,6 +59,14 @@ def video_feed():
 
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+def log_user(face_ids):
+    log_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+    for id in face_ids:
+        if id != '':
+            user_server.log_user(id, log_time)
 
 
 def push_user_data_msg(face_ids):

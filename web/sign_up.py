@@ -2,8 +2,8 @@ from flask import Flask, render_template, Response, request
 from flask import jsonify
 import cv2
 from face_recognize.face_recognizer import FaceRecognizer
-from sign_up_server.user_server import UserServer
-from sign_up_server.user import User
+from user_service.user_server import UserServer
+from user_service.user import User
 app = Flask(__name__)
 
 

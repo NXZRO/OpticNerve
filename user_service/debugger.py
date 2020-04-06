@@ -1,5 +1,5 @@
 from face_recognize.face_recognizer import FaceRecognizer
-from sign_up_server.user_server import UserServer
+from user_service.user_server import UserServer
 import cv2
 import os
 

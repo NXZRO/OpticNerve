@@ -1,4 +1,4 @@
-from database_server.mongo_server import UserTable, EmbTable, IdTable
+from database_server.mongo_server import UserTable, EmbTable, IdTable, LogTable
 from database_server.img_server import ImgServer
 
 
@@ -8,6 +8,7 @@ class UserServer:
         self.id_tb = IdTable()
         self.user_tb = UserTable()
         self.emb_tb = EmbTable()
+        self.log_tb = LogTable()
         self.img_server = ImgServer()
 
     def new_user(self, user_name, user_face_embs, user_face_imgs):
@@ -69,6 +70,26 @@ class UserServer:
 
             print("remove user success ...")
             return True
+
+    def get_user_by_uid(self, uid):
+        return self.user_tb.get_user_data_by_uid(uid)
+
+    def get_user_by_name(self, user_name):
+        return self.user_tb.get_user_data_by_name(user_name)
+
+    def get_user_imgs(self, user_name):
+        return self.img_server.load_imgs(user_name)
+
+    def get_users(self):
+        return self.user_tb.get_users()
+
+    def log_user(self, user_name, log_time):
+        user = self.get_user_by_name(user_name)
+        log_data = {"uid": user['uid'], "name": user_name, "log_time": log_time}
+        self.log_tb.insert_user_log(log_data)
+
+    def get_log_users(self):
+        return self.log_tb.get_user_logs()
 
     def show_user(self):
         self.user_tb.show_table()
