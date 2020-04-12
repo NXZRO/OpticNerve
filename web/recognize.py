@@ -4,8 +4,8 @@ import cv2
 import threading
 import time
 
-from face_recognize.face_recognizer import FaceRecognizer
-from user_service.user_server import UserServer
+from recognize_server.face_recognizer import FaceRecognizer
+from management_server.user_server import UserServer
 
 
 app = Flask(__name__)

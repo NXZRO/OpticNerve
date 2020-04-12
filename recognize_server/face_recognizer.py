@@ -1,6 +1,6 @@
 import cv2
-from face_recognize.face_detector import FaceDetector
-from face_recognize.face_embedder import FaceEmbedder
+from recognize_server.face_detector import FaceDetector
+from recognize_server.face_embedder import FaceEmbedder
 from database_server.flann_server import FlannServer
 import time
 

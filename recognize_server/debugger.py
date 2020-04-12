@@ -1,6 +1,6 @@
 import cv2
-from face_recognize.face_detector import FaceDetector
-from face_recognize.face_embedder import FaceRecognizer
+from recognize_server.face_detector import FaceDetector
+from recognize_server.face_embedder import FaceRecognizer
 import time
 
 DetectingState = 0

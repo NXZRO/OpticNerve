@@ -46,4 +46,4 @@ class ImgServer:
 if __name__ == '__main__':
     # remove all data
     img_server = ImgServer()
-    # img_server.reset()
+    img_server.reset()

@@ -1,5 +1,5 @@
-from face_recognize.face_recognizer import FaceRecognizer
-from user_service.user_server import UserServer
+from recognize_server.face_recognizer import FaceRecognizer
+from management_server.user_server import UserServer, User
 import cv2
 import os
 
@@ -30,34 +30,22 @@ def test_sign_up_dataset():
             user_face_embs.append(face_embs[0])
             user_faces_imgs.append(frame)
 
+        user = User()
+
+        user.name = user_name
+
+        user.face_embs = user_face_embs
+
+        user.face_imgs = user_faces_imgs
+
+        user.title = "TestTitle"
+
+        user.college = "TestCollege"
+
+        user.department = "TestDept"
+
         # new user by user data
-        user_server.new_user(user_name, user_face_embs, user_faces_imgs)
-
-
-def test_sign_up_local(user_name):
-
-    recognizer = FaceRecognizer(recognize_flag=False)
-
-    user_server = UserServer()
-
-    camera = cv2.VideoCapture(0)  # Fish -> first camera
-
-    while True:
-
-        ret, frame = camera.read()  # get frame
-
-        frame, face_embs = recognizer.embedding(frame)
-
-        cv2.imshow('frame', frame)  # show frame in window
-
-        # press 'q' to stop
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    camera.release()  # camera release
-    cv2.destroyAllWindows()  # close windows
-
-    user_server.new_user(user_name, [face_embs[0]], frame)  # new user
+        user_server.new_user(user)
 
 
 def test_delete_user(inp_user_name):
@@ -67,17 +55,13 @@ def test_delete_user(inp_user_name):
 
 def test_show_user():
     user_server = UserServer()
-    user_server.show_user()
+    print(user_server.get_users())
 
 
 if __name__ == '__main__':
 
     # sign up from test img base people
     test_sign_up_dataset()
-
-    # sign up by web camera
-    # user_name = "Frank"
-    # test_sign_up_local(user_name)
 
     # delete user
     # user_name = "frank"

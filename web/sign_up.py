@@ -1,11 +1,10 @@
 from flask import Flask, render_template, Response, request
 from flask import jsonify
 import cv2
-from face_recognize.face_recognizer import FaceRecognizer
-from user_service.user_server import UserServer
-from user_service.user import User
-app = Flask(__name__)
+from recognize_server.face_recognizer import FaceRecognizer
+from management_server.user_server import UserServer, User
 
+app = Flask(__name__)
 
 camera = cv2.VideoCapture(0)  # 0 -> first camera
 
@@ -45,61 +44,92 @@ def video_feed():
 
 @app.route('/')
 def index():
-    return render_template('/sign_up/sign_up.html')
+    return render_template('/sign_up/input_name.html')
 
 
 @app.route("/info", methods=['POST'])
 def info():
-    print("info")
-
     username = request.values['username']
 
-    exist = user_server.check_user_name_is_exist(username)
+    print(username)
 
-    if exist:
-        print("username: '{}' is exist".format(username))
-        data = {'resp': "/info",
-                'result': False,
-                'msg': "username '{}' is exist".format(username)}
+    ok = check_username(username)
+
+    if ok:
+
+        user.name = username
+
+        colleges = user_server.get_colleges()
+
+        departments = user_server.get_departments(colleges[0])
+
+        return render_template('/sign_up/input_info.html', colleges=colleges, departments=departments)
 
     else:
-        user.name = username
-        print("username: {}".format(username))
-        data = {'resp': "/info",
-                'result': True,
-                'msg': "check username '{}' is ok".format(username)}
-
-    return jsonify(data)
+        return render_template('/sign_up/input_name.html')
 
 
-@app.route('/capture')
+@app.route("/get_departments", methods=['POST'])
+def get_departments():
+    college = request.values['college']
+
+    departments = user_server.get_departments(college)
+
+    return jsonify({"departments": departments})
+
+
+@app.route("/capture", methods=['POST'])
 def capture():
-    print("capture")
+    title = request.values['title']
+    college = request.values['college']
+    department = request.values['department']
 
-    user.face_imgs.append(tmp_user.face_imgs)
-    user.face_embs.append(tmp_user.face_embs[0])
+    print(title)
+    print(college)
+    print(department)
 
-    data = {'resp': '/capture',
-            'result': True,
-            'value': len(user.face_imgs)}
+    user.title = title
+    user.college = college
+    user.department = department
 
-    return jsonify(data)
+    return render_template('/sign_up/capture_face.html', face_number=0)
 
 
-@app.route('/finish')
+@app.route('/capture_finish', methods=['POST'])
+def capture_finish():
+
+    if len(tmp_user.face_embs) == 0:
+
+        return render_template('/sign_up/capture_face.html', face_number=0)
+
+    else:
+        user.face_imgs.append(tmp_user.face_imgs)
+        user.face_embs.append(tmp_user.face_embs[0])
+
+        face_number = len(user.face_imgs)
+        print(face_number)
+
+        return render_template('/sign_up/capture_finish.html', face_number=face_number)
+
+
+@app.route('/finish', methods=['POST'])
 def finish():
     print("finish")
 
-    ok = user_server.new_user(user.name, user.face_embs, user.face_imgs)
+    ok = user_server.new_user(user)
 
-    user.name = ""
-    user.face_imgs = []
-    user.face_embs = []
+    if ok:
+        return render_template('/sign_up/finish.html')
 
-    data = {'resp': '/finish',
-            'result': ok}
+    else:
+        return "Sign up false"
 
-    return jsonify(data)
+
+def check_username(username):
+    if username == '':
+        return False
+    else:
+        return True
 
 
 if __name__ == '__main__':

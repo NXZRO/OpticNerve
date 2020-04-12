@@ -4,6 +4,7 @@ USER_TABLE = "user_tb"
 EMB_TABLE = "emb_tb"
 ID_TABLE = "id_tb"
 LOG_TABLE = "log_tb"
+COLLEGE_TABLE = "college_tb"
 
 
 class MongoServer:
@@ -14,6 +15,7 @@ class MongoServer:
         self.__user_tb = self.db[USER_TABLE]
         self.__emb_tb = self.db[EMB_TABLE]
         self.__log_tb = self.db[LOG_TABLE]
+        self.__college_tb = self.db[COLLEGE_TABLE]
 
     def reset(self):
         self.__id_tb.remove({})
@@ -100,10 +102,10 @@ class EmbTable(MongoServer):
     def insert_emb(self, data):
         self.__emb_tb.insert_one(data)
 
-    def get_emb_data(self, eid):
+    def get_face_emb(self, eid):
         emb_data = None
         for data in self.__emb_tb.find({"eid": eid}):
-            emb_data = data
+            emb_data = data['face_emb']
         return emb_data
 
     def get_uid(self, eid):
@@ -149,19 +151,38 @@ class LogTable(MongoServer):
             print(tb)
 
 
+class CollegeTable(MongoServer):
+    def __init__(self):
+        super().__init__()
+        self.__college_tb = self.db[COLLEGE_TABLE]
+
+    def get_colleges(self):
+        return [college['college'] for college in self.__college_tb.find()]
+
+    def get_departments(self, college):
+        departments = [college['departments'] for college in self.__college_tb.find({"college": college})][0]
+        return departments
+
+    def show_table(self):
+        for tb in self.__college_tb.find():
+            print(tb)
+
+
 if __name__ == '__main__':
     # remove all data
     db = MongoServer()
-    # db.reset()
+    db.reset()
 
     # initial table
     id_tb = IdTable()
     emb_tb = EmbTable()
     user_tb = UserTable()
     log_tb = LogTable()
+    college_tb = CollegeTable()
 
     # show tables
     id_tb.show_table()
     user_tb.show_table()
     log_tb.show_table()
+    # college_tb.show_table()
     # emb_tb.show_table()

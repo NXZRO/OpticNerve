@@ -1,5 +1,5 @@
 import cv2
-from face_recognize.face_recognizer import FaceRecognizer
+from recognize_server.face_recognizer import FaceRecognizer
 import time
 
 if __name__ == '__main__':

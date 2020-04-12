@@ -3,8 +3,7 @@ from flask import jsonify
 import cv2
 import base64
 
-from user_service.user_server import UserServer
-from user_service.user import User
+from management_server.user_server import UserServer
 
 app = Flask(__name__)
 
@@ -13,29 +12,19 @@ camera = cv2.VideoCapture(0)  # 0 -> first camera
 
 user_server = UserServer()
 
-user = User()
-
-tmp_user = User()
-
 
 @app.route('/')
 def index():
-    # return render_template('/admin/admin.html')
-
     users = user_server.get_users()
 
-    print(users)
-
-    return render_template('/admin/test.html', users=users)
+    return render_template('/management/mangement.html', users=users)
 
 
 @app.route('/log')
 def log():
     log_users = user_server.get_log_users()
 
-    print(log_users)
-
-    return render_template('/admin/log.html', log_users=log_users)
+    return render_template('/management/log.html', log_users=log_users)
 
 
 @app.route("/show/<uid>")
@@ -43,21 +32,20 @@ def show(uid):
     print("show_user")
 
     uid = int(uid)
+
     print(uid)
 
     user = user_server.get_user_by_uid(uid)
 
-    print(user)
+    user_imgs = user_server.get_user_imgs(user['name'])
 
-    user_name = user['name']
-
-    user_imgs = user_server.get_user_imgs(user_name)
+    face_embs = user_server.get_face_embs(user['eids'])
 
     user_img_urls = []
     for user_img in user_imgs:
         user_img_urls.append(encode_img_data(user_img))
 
-    return render_template('/admin/user.html', user=user, user_img_urls=user_img_urls)
+    return render_template('/management/user.html', user=user, face_embs=face_embs, user_img_urls=user_img_urls)
 
 
 @app.route("/remove/<uid>")
@@ -65,11 +53,10 @@ def remove(uid):
     print("remove_user")
 
     uid = int(uid)
+
     print(uid)
 
     user = user_server.get_user_by_uid(uid)
-
-    print(user)
 
     user_name = user['name']
 
@@ -77,7 +64,7 @@ def remove(uid):
 
     users = user_server.get_users()
 
-    return render_template('/admin/test.html', users=users)
+    return render_template('/management/mangement.html', users=users)
 
 
 def encode_img_data(frame):

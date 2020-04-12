@@ -15,6 +15,17 @@
         <div class="col">
             <div class="card-body">
                 <h5 class="card-title">Name: {{ user.name }}</h5>
+                <p class="card-text">uid: {{user.uid}}</p>
+                <p class="card-text">Title: {{user.title}}</p>
+                <p class="card-text">College: {{user.college}}</p>
+                <p class="card-text">Department: {{user.department}}</p>
+                {% for eid in user.eids %}
+                    <p class="card-text">eids: {{eid}}</p>
+                {%- endfor %}
+
+                {% for face_emb in face_embs %}
+                    <p class="card-text">face embs: {{ face_emb }}</p>
+                {%- endfor %}
             </div>
         </div>
     </div>
