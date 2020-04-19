@@ -1,0 +1,49 @@
+{% extends "./sign_up/base.html" %}
+
+{% block content %}
+<form method='post' action="{{ url_for('capture') }}">
+    <div class="form-group">
+        <label for="title" class="label-lg">職稱</label>
+        <select class="form-control" id="title" name="title">
+            <option>學生</option>
+            <option>老師</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="title" class="label-lg">學院</label>
+        <select class="form-control" id="college" name="college">
+            {% for college in colleges %}
+                <option>{{college}}</option>
+            {%- endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="title" class="label-lg">系所</label>
+        <select class="form-control" id="department" name="department">
+            {% for department in departments %}
+                <option>{{department}}</option>
+            {%- endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $("#college").change(function () {
+        let college = $(this).children("option:selected").val();
+        console.log("colleges option:"+ college);
+
+        $.post("/get_departments", {"college": college}, function (data) {
+            let dept_select = $("#department");
+            dept_select.empty();
+
+            let depts = data["departments"];
+            for (let i = 0; i < depts.length; i++) {
+                 dept_select.append("<option>"+depts[i]+"</option>");
+            }
+        });
+    });
+</script>
+{% endblock %}

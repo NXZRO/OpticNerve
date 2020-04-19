@@ -1,0 +1,36 @@
+body {
+    color: #ffffff;
+}
+
+.label-xl {
+    font-size: 72px;
+    margin-bottom: 15px;
+}
+
+.label-lg {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.label-md {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.label-sm {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.input {
+    width: 50%;
+}
+
+.video {
+    width: 480px;
+    height: 480px;
+}
+
+.btn {
+    margin: 25px;
+}
