@@ -17,33 +17,14 @@ tmp_user = User()
 recognizer = FaceRecognizer(recognize_flag=False)
 
 
-def gen():
-
-    while True:
-        ret, frame = camera.read()  # get frame
-
-        frame = cv2.resize(frame, (480, 480))
-
-        frame, face_embs = recognizer.embedding(frame)
-
-        tmp_user.face_embs = face_embs
-
-        tmp_user.face_imgs = frame
-
-        img_array = cv2.imencode('.jpg', frame)[1]  # encode frame to bytes
-        img_bytes = img_array.tostring()
-
-        yield (b'--frame\r\n' + b'Content-Type: image/jpeg\r\n\r\n' + img_bytes + b'\r\n')
-
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
 @app.route('/')
-def index():
+def sign_up():
+    global user, tmp_user
+
+    user = User()
+
+    tmp_user = User()
+
     return render_template('/sign_up/input_name.html')
 
 
@@ -123,6 +104,31 @@ def finish():
 
     else:
         return "Sign up false"
+
+
+def gen():
+
+    while True:
+        ret, frame = camera.read()  # get frame
+
+        frame = cv2.resize(frame, (480, 480))
+
+        frame, face_embs = recognizer.embedding(frame)
+
+        tmp_user.face_embs = face_embs
+
+        tmp_user.face_imgs = frame
+
+        img_array = cv2.imencode('.jpg', frame)[1]  # encode frame to bytes
+        img_bytes = img_array.tostring()
+
+        yield (b'--frame\r\n' + b'Content-Type: image/jpeg\r\n\r\n' + img_bytes + b'\r\n')
+
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 def check_username(username):

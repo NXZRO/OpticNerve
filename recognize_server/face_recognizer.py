@@ -1,8 +1,14 @@
 import cv2
 from recognize_server.face_detector import FaceDetector
 from recognize_server.face_embedder import FaceEmbedder
+
 from database_server.flann_server import FlannServer
+from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 import time
+import os
+
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DetectingState = 0
 RecognizingState = 1
@@ -30,12 +36,12 @@ class FaceRecognizer:
 
             face_ids = self.flann_server.search(face_embs)
 
-            self.__draw_face_info(frame, face_locations, face_ids, RecognizingState)
+            frame = self.__draw_face_info(frame, face_locations, face_ids, RecognizingState)
 
         else:
             print("detecting ...")
 
-            self.__draw_face_info(frame, face_locations, face_ids, DetectingState)
+            frame = self.__draw_face_info(frame, face_locations, face_ids, DetectingState)
 
         return frame, face_ids
 
@@ -52,8 +58,7 @@ class FaceRecognizer:
 
         return frame, face_embs
 
-    @staticmethod
-    def __draw_face_info(frame, face_locs, face_ids, process_state):
+    def __draw_face_info(self, frame, face_locs, face_ids, process_state):
         color_dict = {0: (255, 0, 0), 1: (0, 255, 0)}
         color = color_dict[process_state]
 
@@ -78,9 +83,12 @@ class FaceRecognizer:
                 if face_id == "":
                     face_id = "Unknow" + str(i)
 
-                cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-                cv2.putText(frame, face_id, (x1, y1 - 20), cv2.FONT_HERSHEY_DUPLEX,
-                            1, color, 1, cv2.LINE_AA)
+                frame = cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+                frame = self.__draw_text(frame, face_id, (x1, y1 - 30), color)
+                # cv2.putText(frame, face_id, (x1, y1 - 20), cv2.FONT_HERSHEY_DUPLEX,
+                #             1, color, 1, cv2.LINE_AA)
+
+        return frame
 
     @staticmethod
     def __draw_face_boxes(frame, face_locations):
@@ -89,6 +97,15 @@ class FaceRecognizer:
             (x1, y1, x2, y2) = face_loc
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)  # draw face box
 
+        return frame
+
+    @staticmethod
+    def __draw_text(frame, text, location, color):
+        img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype(PACKAGE_DIR + "/font/kaiu.ttf", 30, encoding="utf-8")
+        draw.text(location, text, color, font=font)
+        frame = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         return frame
 
 

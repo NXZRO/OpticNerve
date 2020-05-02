@@ -1,5 +1,6 @@
-from database_server.mongo_server import UserTable, EmbTable, IdTable, LogTable, CollegeTable
+from database_server.mongo_server import MongoServer, UserTable, EmbTable, IdTable, LogTable, CollegeTable
 from database_server.img_server import ImgServer
+from database_server.flann_server import FlannServer
 
 
 class User:
@@ -37,6 +38,8 @@ class UserServer:
         self.emb_tb = EmbTable()
         self.log_tb = LogTable()
         self.college_tb = CollegeTable()
+        self.mongo_server = MongoServer()
+        self.flann_server = FlannServer()
         self.img_server = ImgServer()
 
     def new_user(self, user):
@@ -97,6 +100,11 @@ class UserServer:
 
             print("remove user success ...")
             return True
+
+    def reset_database(self):
+        self.mongo_server.reset()
+        self.img_server.reset()
+        self.flann_server.reset()
 
     def get_user_by_uid(self, uid):
         return self.user_tb.get_user_data_by_uid(uid)

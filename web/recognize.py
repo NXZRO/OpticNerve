@@ -1,5 +1,4 @@
 from flask import Flask, render_template, Response
-from flask_socketio import SocketIO
 import cv2
 import threading
 import time
@@ -9,22 +8,10 @@ from management_server.user_server import UserServer
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
 
 user_server = UserServer()
 
 recognizer = FaceRecognizer()
-
-face_id_cache = []
-
-t0 = time.time()
-
-
-@socketio.on('connect event')
-def connect(json):
-    print('received json: ' + str(json))
-    socketio.emit('log_msg', {'data': 'connect success!'})
 
 
 def gen():
@@ -69,27 +56,10 @@ def log_user(face_ids):
             user_server.log_user(id, log_time)
 
 
-def push_user_data_msg(face_ids):
-    print("Child thread:")
-    print(face_id_cache)
-    print(face_ids)
-
-    for id in face_ids:
-        if id not in face_id_cache:
-            if id != '':
-                face_id_cache.append(id)
-                socketio.emit('append_user_card', {'data': id})
-
-    for idx, cache_id in enumerate(face_id_cache):
-        if cache_id not in face_ids:
-            face_id_cache.pop(idx)
-            socketio.emit('remove_user_card', {'data': cache_id})
-
-
 @app.route('/')
 def index():
     return render_template('/recognize/recognize.html')
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    app.run()

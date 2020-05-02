@@ -7,11 +7,7 @@ from management_server.user_server import UserServer
 
 app = Flask(__name__)
 
-
-camera = cv2.VideoCapture(0)  # 0 -> first camera
-
 user_server = UserServer()
-
 
 @app.route('/')
 def index():
@@ -27,6 +23,14 @@ def log():
     return render_template('/management/log.html', log_users=log_users)
 
 
+@app.route('/reset_database')
+def reset_database():
+    user_server.reset_database()
+    users = user_server.get_users()
+
+    return render_template('/management/mangement.html', users=users)
+
+
 @app.route("/show/<uid>")
 def show(uid):
     print("show_user")
@@ -39,13 +43,19 @@ def show(uid):
 
     user_imgs = user_server.get_user_imgs(user['name'])
 
-    face_embs = user_server.get_face_embs(user['eids'])
+    eids = user['eids']
+
+    face_embs = user_server.get_face_embs(eids)
+
+    emb_infos = []
+    for eid, emb in zip(eids, face_embs):
+        emb_infos.append({'eid': eid, 'face_emb': emb})
 
     user_img_urls = []
     for user_img in user_imgs:
         user_img_urls.append(encode_img_data(user_img))
 
-    return render_template('/management/user.html', user=user, face_embs=face_embs, user_img_urls=user_img_urls)
+    return render_template('/management/user.html', user=user, emb_infos=emb_infos, user_img_urls=user_img_urls)
 
 
 @app.route("/remove/<uid>")
