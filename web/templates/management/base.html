@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
 <!DOCTYPE html>
@@ -44,10 +44,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav d-flex justify-content-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Management</a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/log">Log</a>
+                        <a class="nav-link" href="{{url_for('recognize')}}">Recognize</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('sign_up')}}">Sign up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('management')}}">Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('log')}}">Log</a>
                     </li>
                 </ul>
             </div>

@@ -35,12 +35,19 @@ class FlannServer:
         self.emb_tb_eids, self.emb_tb_embs = self.emb_tb.get_eids_embs()
         self.emb_tb_embs = np.array(self.emb_tb_embs)
 
-        # building flann index
-        self.params = self.flann.build_index(self.emb_tb_embs, algorithm="autotuned",
-                                             target_precision=TargetPrecision)
-        # save params and index
-        self.__save_params(self.params)
-        self.flann.save_index(INDEX_FILE.encode('utf-8'))
+        if self.emb_tb_eids:
+
+            # building flann index
+            self.params = self.flann.build_index(self.emb_tb_embs, algorithm="autotuned",
+                                                 target_precision=TargetPrecision)
+            # save params and index
+            self.__save_params(self.params)
+            self.flann.save_index(INDEX_FILE.encode('utf-8'))
+
+            return True
+
+        else:
+            return False
 
     def load(self):
         print("loading flann...")

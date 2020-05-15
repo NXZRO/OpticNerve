@@ -21,15 +21,19 @@ class FaceRecognizer:
         self.face_embedder = FaceEmbedder()
 
         if recognize_flag is True:
-            self.flann_server.build()
-            self.flann_server.load()
+            ok = self.flann_server.build()
+            if ok:
+                self.flann_server.load()
+                self.search_flag = True
+            else:
+                self.search_flag = False
 
     def recognize(self, frame):
         face_ids = []
 
         face_locations = self.face_detector.detect(frame)
 
-        if face_locations:
+        if face_locations and self.search_flag:
             print("recognizing ...")
 
             face_embs = self.face_embedder.embedding(frame, face_locations)
@@ -88,6 +92,14 @@ class FaceRecognizer:
                 # cv2.putText(frame, face_id, (x1, y1 - 20), cv2.FONT_HERSHEY_DUPLEX,
                 #             1, color, 1, cv2.LINE_AA)
 
+        else:
+            for i, face_loc in enumerate(face_locs):
+                (x1, y1, x2, y2) = face_loc
+                face_id = "Unknow" + str(i)
+
+                frame = cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+                frame = self.__draw_text(frame, face_id, (x1, y1 - 30), color)
+
         return frame
 
     @staticmethod
@@ -101,10 +113,11 @@ class FaceRecognizer:
 
     @staticmethod
     def __draw_text(frame, text, location, color):
+        b, g, r = color
         img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype(PACKAGE_DIR + "/font/kaiu.ttf", 30, encoding="utf-8")
-        draw.text(location, text, color, font=font)
+        draw.text(location, text, (r, g, b), font=font)
         frame = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         return frame
 

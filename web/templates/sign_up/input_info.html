@@ -1,5 +1,5 @@
 {% extends "./sign_up/base.html" %}
-
+{% block title %}Input Information{% endblock %}
 {% block content %}
 <form method='post' action="{{ url_for('capture') }}">
     <div class="form-group">
@@ -35,7 +35,7 @@
         let college = $(this).children("option:selected").val();
         console.log("colleges option:"+ college);
 
-        $.post("/get_departments", {"college": college}, function (data) {
+        $.post("{{ url_for('get_departments') }}", {"college": college}, function (data) {
             let dept_select = $("#department");
             dept_select.empty();
 
