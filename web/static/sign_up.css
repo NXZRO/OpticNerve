@@ -2,11 +2,6 @@ body {
     color: #ffffff;
 }
 
-.step-block-center {
-    position: relative;
-    top: 20%;
-}
-
 .label-xl {
     font-size: 72px;
     margin-bottom: 15px;
@@ -38,4 +33,9 @@ body {
 
 .btn {
     margin: 25px;
+}
+
+.alert {
+    display: none;
+    color: red;
 }

@@ -1,0 +1,37 @@
+{% extends "./sign_up/base.html" %}
+{% block title %}Input Name{% endblock %}
+{% block content %}
+<form method='post' action="{{ url_for('info') }}">
+    <div class="form-group">
+        <label for="username" class="label-xl">Input Your Name &#x1F606;</label>
+        <input id="username" name="username" type="text" class="form-control" placeholder="Username">
+    </div>
+    <p class="alert">{{alert}}</p>
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    let alert = $('.alert');
+    if (alert.text() === ''){
+        alert.hide();
+    }
+    else{
+        alert.show();
+    }
+
+    $('form').submit(function () {
+
+        // Get the Login Name value and trim it
+        let username = $.trim($('#username').val());
+
+        // Check if empty of not
+        if (username === '') {
+            alert('username is can not empty.');
+            return false;
+        }
+    });
+
+</script>
+{% endblock %}

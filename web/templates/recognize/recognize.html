@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Recognize</title>
     <!--Bootstrap CSS-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -31,67 +31,10 @@
     <div class="row vh-100">
         <!--video container-->
         <div class="col vh-100 d-flex justify-content-center align-items-center">
-            <img class="vh-100" src="{{ url_for('video_feed') }}" alt="video">
-        </div>
-
-        <!-- user info bar -->
-        <div id="user_info_bar" class="">
-            <!-- user card -->
-
+            <img class="vh-100" src="{{ url_for('recognize_video_feed') }}" alt="video">
         </div>
     </div>
 </div>
 
-<script>
-    /* socket */
-    var socket = io();
-
-    // connect event handler
-    socket.on('connect', function () {
-        socket.emit('connect event', {data: 'I\'m connected!'});
-    });
-
-    // log message event from server
-    socket.on('log_msg', function (data) {
-        console.log(data.data);
-    });
-
-    // receive append user card event from server
-    socket.on('append_user_card', function (data) {
-        console.log(data.data);
-        $(card_modal).ready(function () {
-            $("h5").text(data.data);
-            $('#card').attr('id', data.data);
-        });
-        $("#user_info_bar").prepend($(card_modal));
-    });
-
-
-    // receive remove user card event from server
-    socket.on('remove_user_card', function (data) {
-        console.log(data.data);
-        $("#" + data.data).remove();
-    });
-
-
-    var card_modal = "<div id=\"card\" class=\"card\">\n" +
-        "                <div class=\"row no-gutters\">\n" +
-        "                    <div class=\"col d-flex align-items-center justify-content-center\">\n" +
-        "                        <img src=\"\" class=\"card-img\" alt=\"user_img\">\n" +
-        "                    </div>\n" +
-        "                    <div class=\"col\">\n" +
-        "                        <div class=\"card-body\">\n" +
-        "                            <h5 class=\"card-title\">Tom</h5>\n" +
-        "                            <p class=\"card-text\">Student</p>\n" +
-        "                            <p class=\"card-text\">Computer Science & Information Engineering</p>\n" +
-        "                            <p class=\"card-text\">ID: 406410927</p>\n" +
-        "                            <p class=\"card-text\">Fri Mar 20 2020 17:51:54 GMT+0800 (台北標準時間)</p>\n" +
-        "                            <a href=\"#\" class=\"btn btn-primary card-btn\">More</a>\n" +
-        "                        </div>\n" +
-        "                    </div>\n" +
-        "                </div>\n" +
-        "            </div>"
-
-</script>
 </body>
 </html>

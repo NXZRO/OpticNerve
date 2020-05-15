@@ -1,0 +1,9 @@
+main {
+    background: url("./img/home_bg.png") no-repeat center center fixed;
+}
+
+
+.btn-container {
+    position: relative;
+    top: 60%;
+}
