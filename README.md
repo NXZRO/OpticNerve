@@ -4,7 +4,6 @@ OpticNerve is a real-time multi-face recognition system, and provide friendly we
 ## Installation
 ### MongoDB
 - [MongoDB (Enterprise)](https://www.mongodb.com/download-center/enterprise)
-- [MongoDB Command](https://hackmd.io/zichThAiRFyUdIZ_IQgSrA)
 
 ### Python
 - [python 3.6.8](https://www.python.org/downloads/)
